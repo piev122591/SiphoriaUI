@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+/* GLOBAL RESET */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #faf7f2;
+  color: #333;
+  /* padding-top: 70px; */ /* Push content down */
+}
+
+/* ============================= */
+/* FOOTER */
+/* ============================= */
+.footer {
+  background: #2b1b17;
+  color: white;
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 60px;
+  font-size: 0.9rem;
+}
+
+/* ============================= */
+/* FLOATING BUTTONS */
+/* ============================= */
+.floating-buttons {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 9999;
+}
+
+.float-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 22px;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+
+.float-btn:hover {
+  transform: translateY(-5px) scale(1.1);
+}
+
+/* Instagram Gradient */
+.instagram {
+  background: linear-gradient(
+    45deg,
+    #feda75,
+    #fa7e1e,
+    #d62976,
+    #962fbf,
+    #4f5bd5
+  );
+}
+
+/* Messenger */
+.messenger {
+  background: #0084FF;
+}
