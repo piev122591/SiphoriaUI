@@ -1,0 +1,21 @@
+<div style="padding:40px">
+  <h2>Upload Product Image</h2>
+
+  <!-- Select File -->
+  <input type="file" (change)="onFileSelected($event)" />
+
+  <!-- Upload Button -->
+  <button 
+    (click)="uploadImage()" 
+    [disabled]="!selectedFile || isUploading"
+    style="margin-left:10px"
+  >
+    {{ isUploading ? 'Uploading...' : 'Upload' }}
+  </button>
+
+  <!-- Preview -->
+ <div *ngIf="imageUrl" style="margin-top:20px">
+  <p>Preview:</p>
+  <img [src]="imageUrl!" width="250" />
+</div>
+</div>
