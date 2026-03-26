@@ -1,0 +1,126 @@
+<div style="padding: 40px">
+  <p></p>
+</div>
+
+<!-- MOBILE HEADER -->
+<div class="mobile-header" *ngIf="step > 1">
+
+  <button class="back-arrow" *ngIf="step !== 2" (click)="goBack()">
+    ←
+  </button>
+
+  <span class="header-title">
+    {{
+      step === 2
+        ? "Choose Category"
+        : step === 3
+        ? selectedCategory
+        : step === 5
+        ? "Your Order"
+        : ""
+    }}
+  </span>
+
+</div>
+
+<div class="cart-icon" (click)="step = 5">
+  🛒
+  <span class="cart-count" *ngIf="getTotalItems() > 0">
+    {{ getTotalItems() }}
+  </span>
+</div>
+
+<div class="container">
+
+  <!-- STEP 2 -->
+
+  <div *ngIf="step === 2">
+    <h2 class="title">Choose Category</h2>
+
+    <div class="category-grid">
+      <div
+        class="category-card"
+        *ngFor="let c of categories"
+        (click)="selectCategory(c)"
+      >
+        <img [src]="c.image_url" />
+
+        <h3>{{ c.name }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+   <div *ngIf="step === 3">
+  <h2 class="category-title">{{ selectedCategory }}</h2>
+
+  <div class="grid">
+    <div 
+      class="product-card" 
+      *ngFor="let p of filteredProducts"
+      (click)="openProductModal(p)"
+    >
+      <img [src]="p.image_url" />
+
+      <h3>{{ p.name | titlecase }}</h3>
+
+    </div>
+  </div>
+
+  <button class="view-order-btn" (click)="step = 5">
+    View Order
+  </button>
+</div>
+
+  <!-- STEP 5 -->
+
+  <div *ngIf="step === 5" class="order-container">
+    <h2 class="order-title">Your Order</h2>
+
+    <div *ngIf="cart.length === 0" class="empty-cart">Your cart is empty</div>
+
+    <div *ngFor="let item of cart" class="order-item">
+      <div class="order-info">
+        <div class="order-name">{{ item.name }}</div>
+        <div class="order-price">₱{{ item.price }}</div>
+      </div>
+
+      <div class="order-controls">
+        <button class="qty-btn" (click)="decreaseQty(item)">−</button>
+
+        <span class="qty-number">{{ item.qty }}</span>
+
+        <button class="qty-btn" (click)="increaseQty(item)">+</button>
+
+        <button class="remove-btn" (click)="removeItem(item)">✕</button>
+      </div>
+
+      <div class="item-total">₱{{ item.price * item.qty }}</div>
+    </div>
+
+    <!-- TOTAL -->
+
+    <div class="order-total" *ngIf="cart.length > 0">
+      <span>Total</span>
+
+      <span>₱{{ getCartTotal() }}</span>
+    </div>
+
+    <button
+      class="place-order-btn"
+      (click)="placeOrder()"
+      *ngIf="cart.length > 0"
+    >
+      Place Order
+    </button>
+  </div>
+</div>
+
+
+<app-product-modal
+  *ngIf="selectedProduct"
+  [product]="selectedProduct"
+  [productsWithSizes]="selectedProductListWithSizes"
+  (close)="closeModal()"
+  (add)="addToCart($event); closeModal()"
+></app-product-modal>

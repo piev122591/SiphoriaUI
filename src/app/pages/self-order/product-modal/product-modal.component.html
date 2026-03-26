@@ -1,0 +1,45 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2 class="modal-title">{{ product?.name }}</h2>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <!-- IMAGE -->
+    <div class="img-wrapper">
+      <img [src]="product?.image_url" class="modal-img" />
+    </div>
+
+    <!-- PRICE -->
+    <p class="price">₱{{ getPrice() }}</p>
+
+    <!-- ✅ SIZE SELECT (BEST POSITION) -->
+    <div class="size-container">
+      <p class="label">Size</p>
+
+      <div class="size-options">
+        <button
+          *ngFor="let p of productsWithSizes"
+          [class.active]="selectedSize === p.size"
+          (click)="onSelectSize(p)"
+        >
+          {{ p.size }} oz
+        </button>
+      </div>
+    </div>
+
+    <!-- QUANTITY -->
+    <div class="qty-control">
+      <button (click)="decrease()">−</button>
+      <span>{{ qty }}</span>
+      <button (click)="increase()">+</button>
+    </div>
+
+    <!-- SUBTOTAL -->
+    <p class="subtotal">Subtotal: ₱{{ getPrice() * qty }}</p>
+
+    <!-- ADD BUTTON -->
+    <button class="add-btn" (click)="onAdd()">Add to Order</button>
+  </div>
+</div>
