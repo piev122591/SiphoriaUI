@@ -1,41 +1,59 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2 class="title">☕ Siphoria Login</h2>
+<div class="login-page">
+  <div class="login-overlay">
 
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <div class="brand-panel">
+      <span class="brand-eyebrow">Welcome Back</span>
+      <h1 class="brand-title">Siphoria<br>Coffee</h1>
+      <p class="brand-sub">Sign in to manage your orders<br>and keep things brewing.</p>
+    </div>
 
-      <div class="form-group">
-        <label>Username</label>
-        <input
-          type="text"
-          formControlName="username"
-          placeholder="Enter your username"
-        />
-        <small *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
-          Username is required
-        </small>
+    <div class="login-card">
+      <div class="card-header">
+        <span class="card-tag">Admin Portal</span>
+        <h2 class="card-title">Sign In</h2>
       </div>
 
-      <div class="form-group">
-        <label>Password</label>
-        <input
-          type="password"
-          formControlName="password"
-          placeholder="Enter your password"
-        />
-        <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          Password is required
-        </small>
-      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
 
-      <button type="submit" [disabled]="loginForm.invalid || isLoading">
-        {{ isLoading ? 'Logging in...' : 'Login' }}
-      </button>
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            formControlName="username"
+            placeholder="Enter your username"
+            [class.input-error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+          />
+          <small *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+            Username is required
+          </small>
+        </div>
 
-      <p class="error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </p>
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [class.input-error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <small *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Password is required
+          </small>
+        </div>
 
-    </form>
+        <button type="submit" [disabled]="loginForm.invalid || isLoading" class="login-btn">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading" class="loader-wrap">
+            <span class="spinner"></span> Signing in...
+          </span>
+        </button>
+
+        <p class="error-msg" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </p>
+
+      </form>
+    </div>
+
   </div>
 </div>

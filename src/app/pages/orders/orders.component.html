@@ -1,0 +1,148 @@
+<div class="orders-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Reports</span>
+      <h1 class="page-title">Orders</h1>
+    </div>
+    <button class="refresh-btn" (click)="loadOrders()" [disabled]="isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.spinning]="isLoading">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- DATE FILTER -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>From</label>
+      <input type="date" [(ngModel)]="startDate" class="date-input" />
+    </div>
+    <div class="filter-group">
+      <label>To</label>
+      <input type="date" [(ngModel)]="endDate" class="date-input" />
+    </div>
+    <button class="search-btn" (click)="loadOrders()" [disabled]="isLoading">Search</button>
+  </div>
+
+  <!-- LOADING -->
+  <div class="state-box" *ngIf="isLoading">
+    <div class="pulse-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state-box error-state" *ngIf="!isLoading && errorMessage">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d9534f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="state-box" *ngIf="!isLoading && !errorMessage && orders.length === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+      <rect x="9" y="3" width="6" height="4" rx="1"/>
+    </svg>
+    <p>No orders found.</p>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap" *ngIf="!isLoading && !errorMessage && orders.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Remarks</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let order of orders">
+          <!-- Main row -->
+          <tr [class.row-expanded]="expandedOrderId === order.id">
+            <td class="order-id" data-label="Order #">#{{ order.id }}</td>
+            <td class="customer-cell" data-label="Customer">{{ order.name }}</td>
+            <td class="items-cell" data-label="Items">
+              <button class="items-btn" (click)="toggleExpand(order.id)" [disabled]="loadingDetailId === order.id">
+                <span *ngIf="loadingDetailId !== order.id">
+                  {{ order.order_details?.length ?? '—' }} item(s)
+                  <span class="chevron" [class.open]="expandedOrderId === order.id">▾</span>
+                </span>
+                <span *ngIf="loadingDetailId === order.id" class="detail-loading">loading…</span>
+              </button>
+            </td>
+            <td class="total-cell" data-label="Total">{{ order.total }}</td>
+            <td class="status-cell" data-label="Status">
+              <span class="status-badge" [ngClass]="getStatusClass(order.status_id)">
+                {{ getStatusLabel(order.status_id) }}
+              </span>
+            </td>
+            <td class="remarks-cell" data-label="Remarks">{{ order.remarks || '—' }}</td>
+            <td class="date-cell" data-label="Date">{{ order.order_date | date:'MMM d, y · h:mm a' }}</td>
+          </tr>
+
+          <!-- Detail row -->
+          <tr class="detail-row" *ngIf="expandedOrderId === order.id">
+            <td colspan="7" class="detail-cell">
+              <div class="detail-panel">
+                <div class="detail-panel-header">
+                  <span class="detail-panel-title">Order Items</span>
+                  <span class="detail-count">{{ order.order_details?.length }} item(s)</span>
+                </div>
+
+                <!-- Desktop table -->
+                <table class="detail-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Size</th>
+                      <th>Qty</th>
+                      <th>Unit Price</th>
+                      <th>Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let d of order.order_details">
+                      <td>{{ d.product_name }}</td>
+                      <td>{{ d.size_name || '—' }}</td>
+                      <td>{{ d.qty }}</td>
+                      <td>₱{{ toPrice(d.price) }}</td>
+                      <td class="subtotal-cell">₱{{ getSubtotal(d.price, d.qty) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- Mobile cards (shown only on small screens via CSS) -->
+                <div class="detail-cards">
+                  <div class="detail-card" *ngFor="let d of order.order_details">
+                    <div class="detail-card-top">
+                      <span class="detail-card-name">{{ d.product_name }}</span>
+                      <span class="detail-card-tag" *ngIf="d.size_name">{{ d.size_name }}</span>
+                    </div>
+                    <div class="detail-card-bottom">
+                      <span class="detail-card-meta">{{ d.qty }}&times; &nbsp;₱{{ toPrice(d.price) }} each</span>
+                      <span class="detail-card-subtotal">₱{{ getSubtotal(d.price, d.qty) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+</div>

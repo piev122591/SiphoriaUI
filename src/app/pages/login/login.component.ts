@@ -54,7 +54,7 @@ export class LoginComponent {
       next: (response: any) => {
         localStorage.setItem('token', response.token);
         this.isLoading = false;
-        this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/admin/orders']);
       },
       error: () => {
         this.isLoading = false;

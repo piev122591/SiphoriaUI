@@ -1,64 +1,246 @@
-.login-container {
+.login-page {
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #3e2723, #5d4037);
+  min-height: 560px;
+  background: url('/Cover.png') center center / cover no-repeat;
+  position: relative;
 }
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(8, 3, 1, 0.72) 0%,
+    rgba(8, 3, 1, 0.82) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 80px;
+  padding: 40px 24px;
+}
+
+
+/* ===========================
+   BRAND PANEL
+   =========================== */
+
+.brand-panel {
+  max-width: 340px;
+  text-align: left;
+}
+
+.brand-eyebrow {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  margin-bottom: 22px;
+}
+
+.brand-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+  margin: 0 0 24px;
+  letter-spacing: -1px;
+}
+
+.brand-sub {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.9;
+  margin: 0;
+}
+
+.brand-divider {
+  width: 36px;
+  height: 1px;
+  background: #c9a96e;
+  margin-top: 36px;
+}
+
+
+/* ===========================
+   LOGIN CARD
+   =========================== */
 
 .login-card {
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  width: 350px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  padding: 44px 40px 40px;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
 }
 
-.title {
-  text-align: center;
-  margin-bottom: 25px;
-  color: #3e2723;
+.card-header {
+  margin-bottom: 32px;
 }
+
+.card-tag {
+  display: inline-block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0;
+}
+
+
+/* ===========================
+   FORM
+   =========================== */
 
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
 }
 
-input {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+.form-group label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
 }
 
-input:focus {
-  border-color: #6d4c41;
+.form-group input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 12px 14px;
+  border-radius: 2px;
+  border: 1px solid #e0d6cc;
+  background: #fdfaf7;
+  color: #2c1810;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   outline: none;
 }
 
-button {
+.form-group input::placeholder {
+  color: #c5b9ae;
+}
+
+.form-group input:focus {
+  border-color: #c9a96e;
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.12);
+}
+
+.form-group input.input-error {
+  border-color: #d9534f;
+}
+
+.form-group small {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: #d9534f;
+  margin-top: 5px;
+}
+
+.login-btn {
   width: 100%;
-  padding: 12px;
+  margin-top: 8px;
+  padding: 14px;
   border: none;
-  background: #6d4c41;
-  color: white;
-  border-radius: 6px;
+  background: #c9a96e;
+  color: #1a0a05;
+  border-radius: 2px;
   cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover {
-  background: #4e342e;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-  text-align: center;
-}
-
-small {
-  color: red;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
   font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+  background: #dfc08a;
+  transform: translateY(-1px);
+}
+
+.login-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.loader-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(26, 10, 5, 0.3);
+  border-top-color: #1a0a05;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-msg {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  color: #d9534f;
+  text-align: center;
+  margin: 16px 0 0;
+}
+
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 768px) {
+  .login-overlay {
+    flex-direction: column;
+    gap: 32px;
+    justify-content: center;
+  }
+
+  .brand-panel {
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .brand-title {
+    font-size: 2.6rem;
+  }
+
+  .login-card {
+    padding: 36px 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-panel {
+    display: none;
+  }
 }

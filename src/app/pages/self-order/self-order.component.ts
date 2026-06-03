@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
+import { OrderService } from '../../services/order.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
 
 @Component({
@@ -15,9 +16,15 @@ export class SelfOrderComponent implements OnInit {
   products: any[] = [];
   categories: any[] = [];
   productDetails: any[] =[];
+  customerName = 'Guest';
+  paymentTypeId = 1;
+  statusId = 1; // 1=Pending, 2=Completed, 3=Cancelled
+  remarks = '';
+
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private orderService: OrderService
   ) {}
   ngOnInit(): void {
     this.loadCategories();
@@ -110,14 +117,30 @@ selectCategory(category: any) {
 
 
   placeOrder() {
+    const payload = {
+      name: this.customerName,
+      payment_type_id: this.paymentTypeId,
+      status_id: this.statusId,
+      remarks: this.remarks,
+      order_details: this.cart.map(item => ({
+        product_details_id: item.productId,
+        qty: item.qty,
+        price: item.price
+      }))
+    };
 
-    alert('Order placed!');
-
-    console.log(this.cart);
-
-    this.cart = [];
-    this.step = 1;
-
+    this.orderService.placeOrder(payload).subscribe({
+      next: (res) => {
+        console.log('Order placed:', res);
+        alert('Order placed!');
+        this.cart = [];
+        this.step = 1;
+      },
+      error: (err) => {
+        console.error('Order failed:', err);
+        alert('Failed to place order. Please try again.');
+      }
+    });
   }
 
 

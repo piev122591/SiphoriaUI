@@ -1,13 +1,12 @@
-<nav class="navbar">
+<nav class="navbar" *ngIf="showNavbar">
   <div class="nav-container">
     <div class="logo">Siphoria ☕</div>
 
   <div class="nav-links">
-  <a routerLink="/" routerLinkActive="active">Home</a>
-  <a routerLink="/order" routerLinkActive="active">Menu</a>
-  <a routerLink="/contact" routerLinkActive="active">Contact</a>
-  <a routerLink="/login" routerLinkActive="active">Login</a>
-</div>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+    <a *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Login</a>
+    <a *ngIf="isLoggedIn" routerLink="/admin/orders" routerLinkActive="active">Dashboard</a>
+  </div>
   </div>
 </nav>
 
