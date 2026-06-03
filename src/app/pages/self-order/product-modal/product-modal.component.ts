@@ -17,12 +17,10 @@ export class ProductModalComponent implements  OnChanges  {
   @Output() add = new EventEmitter();
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['product']) {
-      console.log('Product:', this.product);
-    }
-
-    if (changes['productsWithSizes']) {
-      console.log('Products with sizes:', this.productsWithSizes);
+    if (changes['product'] || changes['productsWithSizes']) {
+      this.selectedProductWithSize = null;
+      this.selectedSize = null;
+      this.qty = 1;
     }
   }
 
@@ -43,14 +41,18 @@ decrease() {
   }
 }
 
+isAdding = false;
+
 onAdd() {
-  this.add.emit({
-    ...this.selectedProductWithSize, // includes size + price
-    qty: this.qty
-  });
+  if (this.isAdding) return;
+  this.isAdding = true;
+  setTimeout(() => {
+    this.add.emit({ ...this.selectedProductWithSize, qty: this.qty });
+    this.isAdding = false;
+  }, 700);
 }
 selectedProductWithSize: any;
-selectedSize: number = 16;
+selectedSize: number | null = null;
 
 onSelectSize(p: any) {
   this.selectedProductWithSize = p;

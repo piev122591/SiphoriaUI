@@ -40,6 +40,12 @@
     <p class="subtotal">Subtotal: ₱{{ getPrice() * qty }}</p>
 
     <!-- ADD BUTTON -->
-    <button class="add-btn" (click)="onAdd()">Add to Order</button>
+    <button class="add-btn" (click)="onAdd()"
+      [disabled]="isAdding || (productsWithSizes.length > 0 && !selectedProductWithSize)">
+      <span *ngIf="isAdding" class="btn-spinner"></span>
+      <span *ngIf="!isAdding">
+        {{ productsWithSizes.length > 0 && !selectedProductWithSize ? 'Select a size' : 'Add to Order' }}
+      </span>
+    </button>
   </div>
 </div>

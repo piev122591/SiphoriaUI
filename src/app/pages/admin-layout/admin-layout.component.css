@@ -154,6 +154,31 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  position: relative;
+}
+
+.page-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 243, 237, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(201, 169, 110, 0.2);
+  border-top-color: #c9a96e;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 

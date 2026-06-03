@@ -64,8 +64,29 @@
         <span>Total</span>
         <span>₱{{ getCartTotal() }}</span>
       </div>
-      <button class="place-order-btn" (click)="placeOrder()" *ngIf="cart.length > 0">
-        Place Order
+      <div class="payment-type-group" *ngIf="cart.length > 0">
+        <label class="payment-label">Payment</label>
+        <div class="payment-options">
+          <button
+            *ngFor="let pt of paymentTypes"
+            class="payment-btn"
+            [class.active]="paymentTypeId === pt.id"
+            (click)="paymentTypeId = pt.id">
+            <img *ngIf="pt.logo" [src]="pt.logo" class="payment-logo" [alt]="pt.label" />
+            <ng-container *ngIf="!pt.logo">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M6 12h.01M18 12h.01"/>
+              </svg>
+              <span class="payment-cash-label">{{ pt.label }}</span>
+            </ng-container>
+          </button>
+        </div>
+      </div>
+      <button class="place-order-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder">
+        <span *ngIf="isPlacingOrder" class="btn-spinner"></span>
+        <span *ngIf="!isPlacingOrder">Place Order</span>
       </button>
     </div>
 
@@ -141,8 +162,29 @@
         <span>Total</span>
         <span class="total-amount">₱{{ getCartTotal() }}</span>
       </div>
-      <button class="pos-place-btn" (click)="placeOrder()" *ngIf="cart.length > 0">
-        Place Order
+      <div class="payment-type-group" *ngIf="cart.length > 0">
+        <label class="payment-label">Payment</label>
+        <div class="payment-options">
+          <button
+            *ngFor="let pt of paymentTypes"
+            class="payment-btn"
+            [class.active]="paymentTypeId === pt.id"
+            (click)="paymentTypeId = pt.id">
+            <img *ngIf="pt.logo" [src]="pt.logo" class="payment-logo" [alt]="pt.label" />
+            <ng-container *ngIf="!pt.logo">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M6 12h.01M18 12h.01"/>
+              </svg>
+              <span class="payment-cash-label">{{ pt.label }}</span>
+            </ng-container>
+          </button>
+        </div>
+      </div>
+      <button class="pos-place-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder">
+        <span *ngIf="isPlacingOrder" class="btn-spinner"></span>
+        <span *ngIf="!isPlacingOrder">Place Order</span>
       </button>
     </div>
 

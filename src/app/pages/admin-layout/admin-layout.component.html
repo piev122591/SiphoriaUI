@@ -44,6 +44,9 @@
 
   <!-- MAIN CONTENT -->
   <main class="admin-main">
+    <div class="page-loader" *ngIf="isLoading$ | async">
+      <div class="spinner"></div>
+    </div>
     <router-outlet></router-outlet>
   </main>
 

@@ -1,122 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { OrderService } from '../../services/order.service';
+import { LoadingService } from '../../services/loading.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
 
 @Component({
   selector: 'app-self-order',
   standalone: true,
-  imports: [CommonModule,ProductModalComponent],
+  imports: [CommonModule, FormsModule, ProductModalComponent],
   templateUrl: './self-order.component.html',
   styleUrls: ['./self-order.component.css']
 })
 export class SelfOrderComponent implements OnInit {
   products: any[] = [];
   categories: any[] = [];
-  productDetails: any[] =[];
+  productDetails: any[] = [];
   customerName = 'Guest';
   paymentTypeId = 1;
-  statusId = 1; // 1=Pending, 2=Completed, 3=Cancelled
+
+  paymentTypes = [
+    { id: 1, label: 'Cash', logo: null },
+    { id: 2, label: 'GCash', logo: 'logos/gcash.svg' },
+    { id: 3, label: 'Maya', logo: 'logos/maya.svg' }
+  ];
+  statusId = 1;
   remarks = '';
+
+  step = 2;
+  selectedCategoryId: number | null = null;
+  selectedCategory: string | null = null;
+  selectedProduct: any = null;
+  selectedProductListWithSizes: any[] = [];
+  cart: any[] = [];
+  isPlacingOrder = false;
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private loadingService: LoadingService
   ) {}
+
   ngOnInit(): void {
     this.loadCategories();
     this.loadProducts();
     this.loadProductDetails();
   }
 
-  loadCategories(){
-      this.categoryService.getCategories().subscribe(res => {
-      this.categories = res;
-      console.log(this.categories);
+  loadCategories() {
+    this.loadingService.start();
+    this.categoryService.getCategories().subscribe({
+      next: res => { this.categories = res; this.loadingService.stop(); },
+      error: () => this.loadingService.stop()
     });
   }
 
-  loadProductDetails(){
-    this.productService.getProductDetails().subscribe(res => {
-      this.productDetails = res;
-      console.log(this.productDetails);
-
-       console.log("list products from productDetails");
+  loadProductDetails() {
+    this.loadingService.start();
+    this.productService.getProductDetails().subscribe({
+      next: res => { this.productDetails = res; this.loadingService.stop(); },
+      error: () => this.loadingService.stop()
     });
-
   }
 
   loadProducts() {
-    this.productService.getProducts().subscribe(res => {
-      this.products = res;
-      console.log(this.products);
-
-       console.log("list products");
+    this.loadingService.start();
+    this.productService.getProducts().subscribe({
+      next: res => { this.products = res; this.loadingService.stop(); },
+      error: () => this.loadingService.stop()
     });
-
-
   }
-  step = 2;
-
-  selectedCategoryId: number | null = null;
-  selectedCategory: string | null = null;
-
-// products = [
-//   { id: 1, name: 'Ube Latte', price: 120, category: 1, image: 'products/signatureCoffee/UbeLatte.jpg' },
-//   { id: 2, name: 'Raspberry Latte', price: 120, category: 1, image: 'products/signatureCoffee/RaspberryLatte.jpg' },
-//   { id: 3, name: 'Americano', price: 110, category: 2, image: 'products/classicCoffe/SpanishLatte.jpg' },
-//   { id: 4, name: 'Spanish Latte', price: 130, category: 3, image: 'assets/spanish.jpg' },
-//   { id: 5, name: 'Matcha Latte', price: 140, category: 4, image: 'products/matchaSeries/MatchaLatte.jpg' },
-//   { id: 6, name: 'Dirty Matcha', price: 140, category: 4, image: 'products/matchaSeries/DirtyMatcha.jpg' },
-//   { id: 7, name: 'Strawberry Matcha', price: 140, category: 4, image: 'products/matchaSeries/StrawberryMatcha.jpg' }
-// ];
-
-  selectedProduct: any = null;
-
-
-  selectedProductListWithSizes: any [] = [];
-
-  cart: any[] = [];
 
   get filteredProducts() {
-    return this.products.filter(
-      p => p.categoryid === this.selectedCategoryId
-    );
+    return this.products.filter(p => p.categoryid === this.selectedCategoryId);
   }
 
-  next() {
-    this.step++;
+  selectCategory(category: any) {
+    this.selectedCategory = category.name;
+    this.selectedCategoryId = category.id;
+    this.step = 3;
   }
 
-  back() {
-    this.step--;
+  addToCart(product: any) {
+    const exist = this.cart.find(i => i.id === product.id);
+    if (exist) {
+      exist.qty += product.qty;
+    } else {
+      this.cart.push(product);
+    }
   }
-
-selectCategory(category: any) {
-  this.selectedCategory = category.name;
-  this.selectedCategoryId = category.id;
-  this.step = 3;
-}
-
-
- addToCart(product: any) {
- console.log("cart");
-  console.log(product);
-  const exist = this.cart.find(i => i.id === product.id);
-
-  if (exist) {
-    exist.qty += product.qty; // ✅ use modal qty
-  } else {
-    this.cart.push(product);
-  }
-}
-
-
 
   placeOrder() {
+    if (this.isPlacingOrder) return;
+    this.isPlacingOrder = true;
+
     const payload = {
       name: this.customerName,
       payment_type_id: this.paymentTypeId,
@@ -130,104 +110,69 @@ selectCategory(category: any) {
     };
 
     this.orderService.placeOrder(payload).subscribe({
-      next: (res) => {
-        console.log('Order placed:', res);
-        alert('Order placed!');
+      next: (_) => {
+        this.isPlacingOrder = false;
         this.cart = [];
         this.step = 1;
       },
-      error: (err) => {
-        console.error('Order failed:', err);
+      error: (_) => {
+        this.isPlacingOrder = false;
         alert('Failed to place order. Please try again.');
       }
     });
   }
 
-
-
-
   increaseQty(product: any) {
-
-  const item = this.cart.find(x => x.id === product.id);
-
-  if (item) {
-    item.qty++;
-  } else {
-    this.cart.push({
-      ...product,
-      qty: 1
-    });
+    const item = this.cart.find(x => x.id === product.id);
+    if (item) {
+      item.qty++;
+    } else {
+      this.cart.push({ ...product, qty: 1 });
+    }
   }
 
-}
-
-
-decreaseQty(product: any) {
-
-  const item = this.cart.find(x => x.id === product.id);
-
-  if (!item) return;
-
-  item.qty--;
-
-  if (item.qty <= 0) {
-    this.cart = this.cart.filter(x => x.id !== product.id);
+  decreaseQty(product: any) {
+    const item = this.cart.find(x => x.id === product.id);
+    if (!item) return;
+    item.qty--;
+    if (item.qty <= 0) {
+      this.cart = this.cart.filter(x => x.id !== product.id);
+    }
   }
 
-}
-
-
-filteredProductsWithSizes(productId: number): any[] {
-  return this.productDetails.filter(p => p.productId === productId);
-}
-
-openProductModal(product: any) {
-  this.selectedProductListWithSizes = this.filteredProductsWithSizes(product.id);
-  this.selectedProduct = product;
-
-  console.log(this.filteredProducts); // check result
-}
-
-closeModal() {
-  this.selectedProduct = null;
-}
-
-
-addToCartFromModal() {
-  this.addToCart(this.selectedProduct);
-  this.closeModal();
-}
-
-getQty(product: any) {
-
-  const item = this.cart.find(x => x.id === product.id);
-  return item ? item.qty : 0;
-
-}
-
-getTotalItems() {
-  return this.cart.reduce((total, item) => total + item.qty, 0);
-}
-
-
-removeItem(item:any){
-this.cart = this.cart.filter(i => i !== item);
-}
-
-getCartTotal(){
-return this.cart.reduce((total, item) => total + (item.price * item.qty), 0);
-}
-goBack() {
-
-  if (this.step === 3) {
-    this.step = 2;
-  }
-  else if (this.step === 4) {
-    this.step = 3;
-  }
-  else if (this.step === 5) {
-    this.step = 3;
+  filteredProductsWithSizes(productId: number): any[] {
+    return this.productDetails.filter(p => p.productId === productId);
   }
 
-}
+  openProductModal(product: any) {
+    this.selectedProductListWithSizes = this.filteredProductsWithSizes(product.id);
+    this.selectedProduct = product;
+  }
+
+  closeModal() {
+    this.selectedProduct = null;
+  }
+
+  getQty(product: any) {
+    const item = this.cart.find(x => x.id === product.id);
+    return item ? item.qty : 0;
+  }
+
+  getTotalItems() {
+    return this.cart.reduce((total, item) => total + item.qty, 0);
+  }
+
+  removeItem(item: any) {
+    this.cart = this.cart.filter(i => i !== item);
+  }
+
+  getCartTotal() {
+    return this.cart.reduce((total, item) => total + (item.price * item.qty), 0);
+  }
+
+  goBack() {
+    if (this.step === 3 || this.step === 4 || this.step === 5) {
+      this.step = this.step === 3 ? 2 : 3;
+    }
+  }
 }

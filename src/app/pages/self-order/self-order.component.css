@@ -1,6 +1,4 @@
-/* ===========================
-   SHARED STYLES
-   =========================== */
+/* shared */
 
 .product-card {
   background: white;
@@ -129,9 +127,7 @@
 }
 
 
-/* ===========================
-   MOBILE LAYOUT (default)
-   =========================== */
+/* mobile */
 
 .mobile-only {
   display: block;
@@ -279,6 +275,71 @@
   margin-bottom: 20px;
 }
 
+.payment-type-group {
+  margin: 14px 0 4px;
+}
+
+.payment-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.payment-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.payment-btn {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 500;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  white-space: nowrap;
+  min-width: 52px;
+}
+
+.payment-btn svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.payment-logo {
+  height: 16px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.payment-cash-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.payment-btn.active {
+  border-color: #c9a96e;
+  background: #fef6e4;
+  color: #b07d1a;
+  font-weight: 600;
+}
+
 .place-order-btn {
   display: block;
   margin: 16px auto 0;
@@ -289,12 +350,32 @@
   border: none;
   border-radius: 20px;
   cursor: pointer;
+  min-width: 140px;
+}
+
+.place-order-btn:disabled,
+.pos-place-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 
-/* ===========================
-   DESKTOP / TABLET POS LAYOUT
-   =========================== */
+/* desktop */
 
 @media (min-width: 768px) {
 
@@ -308,8 +389,6 @@
     overflow: hidden;
     background: #f5f0eb;
   }
-
-  /* ---- LEFT PANEL ---- */
 
   .pos-left {
     flex: 1;
@@ -398,8 +477,6 @@
     scrollbar-width: thin;
     scrollbar-color: #ccc transparent;
   }
-
-  /* ---- RIGHT PANEL ---- */
 
   .pos-right {
     width: 360px;

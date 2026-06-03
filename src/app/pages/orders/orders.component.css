@@ -229,6 +229,16 @@ tbody tr:last-child {
   border-bottom: none;
 }
 
+tfoot .table-footer {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  color: #a08060;
+  padding: 10px 16px;
+  text-align: center;
+  border-top: 1px solid #f0e8de;
+  background: #fdfaf7;
+}
+
 tbody tr:hover {
   background: #fdfaf7;
 }
@@ -249,6 +259,27 @@ tbody td {
 .total-cell {
   font-weight: 600;
   color: #2c1810;
+}
+
+.payment-cell {
+  white-space: nowrap;
+}
+
+.payment-cell .payment-logo {
+  height: 14px;
+  width: auto;
+  display: block;
+}
+
+.payment-cell svg {
+  vertical-align: middle;
+}
+
+.payment-cell span {
+  font-size: 0.82rem;
+  color: #2c1810;
+  vertical-align: middle;
+  margin-left: 4px;
 }
 
 .date-cell {
@@ -425,6 +456,58 @@ tbody td {
 .status-pending    { background: #fef6e4; color: #b07d1a; }
 .status-cancelled  { background: #fdecea; color: #c0392b; }
 .status-default    { background: #f0ece8; color: #888; }
+
+.status-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1.5px solid transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 6px 30px 6px 14px;
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.status-select:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.status-select:focus {
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.25);
+  border-color: #c9a96e;
+}
+
+.status-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.status-select.status-completed {
+  background-color: #27ae60;
+  color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+}
+
+.status-select.status-pending {
+  background-color: #fef6e4;
+  color: #b07d1a;
+}
+
+.status-select.status-cancelled {
+  background-color: #e67e22;
+  color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+}
+
+.status-select.status-default { background-color: #f0ece8; color: #888; }
 
 
 /* ===========================

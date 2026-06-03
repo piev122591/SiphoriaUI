@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../services/order.service';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-orders',
@@ -22,13 +23,25 @@ export class OrdersComponent implements OnInit {
   startDate = this.today;
   endDate = this.today;
 
+  statuses = [
+    { status_id: 1, name: 'Pending' },
+    { status_id: 2, name: 'Completed' },
+    { status_id: 3, name: 'Cancelled' }
+  ];
+
   private statusMap: Record<number, string> = {
     1: 'Pending',
     2: 'Completed',
     3: 'Cancelled'
   };
 
-  constructor(private orderService: OrderService) {}
+  paymentTypes = [
+    { id: 1, label: 'Cash', logo: null },
+    { id: 2, label: 'GCash', logo: 'logos/gcash.svg' },
+    { id: 3, label: 'Maya', logo: 'logos/maya.svg' }
+  ];
+
+  constructor(private orderService: OrderService, private loadingService: LoadingService) {}
 
   ngOnInit() {
     this.loadOrders();
@@ -37,21 +50,28 @@ export class OrdersComponent implements OnInit {
   loadOrders() {
     this.isLoading = true;
     this.errorMessage = null;
+    this.loadingService.start();
 
     this.orderService.getOrdersByDate(this.startDate, this.endDate).subscribe({
       next: (data) => {
-        this.orders = data;
+        this.orders = data.map(o => ({ ...o, status_id: +o.status_id, payment_type_id: +o.payment_type_id }));
         this.isLoading = false;
+        this.loadingService.stop();
       },
       error: () => {
         this.errorMessage = 'Failed to load orders. Please try again.';
         this.isLoading = false;
+        this.loadingService.stop();
       }
     });
   }
 
   getStatusLabel(statusId: number): string {
     return this.statusMap[statusId] ?? 'Unknown';
+  }
+
+  getPaymentType(paymentTypeId: number) {
+    return this.paymentTypes.find(p => p.id === paymentTypeId) ?? null;
   }
 
   getStatusClass(statusId: number): string {
@@ -71,6 +91,14 @@ export class OrdersComponent implements OnInit {
   getSubtotal(price: any, qty: number): string {
     const n = parseFloat(String(price ?? '').replace(/[^0-9.]/g, ''));
     return isNaN(n) ? '0.00' : (n * qty).toFixed(2);
+  }
+
+  updateStatus(order: any, newStatusId: number) {
+    const prev = order.status_id;
+    order.status_id = newStatusId;
+    this.orderService.updateOrderStatus(order.id, newStatusId).subscribe({
+      error: () => { order.status_id = prev; }
+    });
   }
 
   toggleExpand(orderId: number) {
