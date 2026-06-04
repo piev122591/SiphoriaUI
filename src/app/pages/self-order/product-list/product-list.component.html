@@ -1,0 +1,6 @@
+<div class="product-grid">
+  <div class="product-card" *ngFor="let p of products" (click)="openProductModal(p)">
+    <img [src]="p.image_url" />
+    <h3>{{ p.name | titlecase }}</h3>
+  </div>
+</div>

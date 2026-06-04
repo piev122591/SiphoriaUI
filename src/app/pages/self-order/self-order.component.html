@@ -33,12 +33,10 @@
     <!-- STEP 3: Products -->
     <div *ngIf="step === 3">
       <h2 class="category-title">{{ selectedCategory }}</h2>
-      <div class="grid">
-        <div class="product-card" *ngFor="let p of filteredProducts" (click)="openProductModal(p)">
-          <img [src]="p.image_url" />
-          <h3>{{ p.name | titlecase }}</h3>
-        </div>
-      </div>
+      <app-product-list
+        [products]="filteredProducts"
+        (productSelected)="onProductSelected($event)">
+      </app-product-list>
       <button class="view-order-btn" (click)="step = 5">View Order</button>
     </div>
 
@@ -118,14 +116,10 @@
         ☕ Select a category to browse products
       </div>
       <div class="pos-product-grid">
-        <div
-          class="product-card"
-          *ngFor="let p of filteredProducts"
-          (click)="openProductModal(p)"
-        >
-          <img [src]="p.image_url" />
-          <h3>{{ p.name | titlecase }}</h3>
-        </div>
+        <app-product-list
+          [products]="filteredProducts"
+          (productSelected)="onProductSelected($event)">
+        </app-product-list>
       </div>
     </div>
 

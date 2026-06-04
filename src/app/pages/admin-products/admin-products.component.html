@@ -1,0 +1,91 @@
+<div class="products-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Catalogue</span>
+      <h1 class="page-title">Products</h1>
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTER -->
+  <div class="filter-bar">
+    <button class="cat-tab" [class.active]="selectedCategoryId === null" (click)="selectCategory(null)">All</button>
+    <button class="cat-tab" *ngFor="let c of categories" [class.active]="selectedCategoryId === c.id" (click)="selectCategory(c.id)">
+      {{ c.name }}
+    </button>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="state-box" *ngIf="filteredProducts.length === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+    <p>No products found.</p>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap" *ngIf="filteredProducts.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Sizes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let p of filteredProducts">
+
+          <!-- Main row -->
+          <tr [class.row-expanded]="expandedProductId === p.id">
+            <td class="img-cell">
+              <img [src]="p.image_url" [alt]="p.name" class="product-thumb" />
+            </td>
+            <td class="name-cell" data-label="Name">{{ p.name | titlecase }}</td>
+            <td class="category-cell" data-label="Category">
+              <span class="category-badge">{{ getCategoryName(p.categoryid) }}</span>
+            </td>
+            <td class="sizes-cell" data-label="Sizes">
+              <button class="sizes-btn" (click)="toggleExpand(p.id)">
+                {{ getVariants(p.id).length }} size(s)
+                <span class="chevron" [class.open]="expandedProductId === p.id">▾</span>
+              </button>
+            </td>
+          </tr>
+
+          <!-- Detail row -->
+          <tr class="detail-row" *ngIf="expandedProductId === p.id">
+            <td colspan="4" class="detail-cell">
+              <div class="detail-panel">
+                <div class="detail-panel-header">
+                  <span class="detail-panel-title">Sizes & Pricing</span>
+                  <span class="detail-count">{{ getVariants(p.id).length }} variant(s)</span>
+                </div>
+
+                <div class="variant-cards">
+                  <div class="variant-card" *ngFor="let v of getVariants(p.id)">
+                    <span class="variant-size">{{ v.size }} oz</span>
+                    <span class="variant-price">₱{{ v.price }}</span>
+                  </div>
+                </div>
+
+              </div>
+            </td>
+          </tr>
+
+        </ng-container>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="table-footer">
+            {{ filteredProducts.length }} product{{ filteredProducts.length !== 1 ? 's' : '' }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>

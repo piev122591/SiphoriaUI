@@ -5,6 +5,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { SelfOrderComponent } from './pages/self-order/self-order.component';
 import { AdminLayoutComponent } from './pages/admin-layout/admin-layout.component';
 import { OrdersComponent } from './pages/orders/orders.component';
+import { AdminProductsComponent } from './pages/admin-products/admin-products.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -31,7 +32,8 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'orders', pathMatch: 'full' },
       { path: 'menu', component: SelfOrderComponent },
-      { path: 'orders', component: OrdersComponent }
+      { path: 'orders', component: OrdersComponent },
+      { path: 'products', component: AdminProductsComponent }
     ]
   },
   {

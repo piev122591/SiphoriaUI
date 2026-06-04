@@ -6,18 +6,18 @@ import { CategoryService } from '../../services/category.service';
 import { OrderService } from '../../services/order.service';
 import { LoadingService } from '../../services/loading.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
+import { ProductListComponent } from './product-list/product-list.component';
 
 @Component({
   selector: 'app-self-order',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductModalComponent],
+  imports: [CommonModule, FormsModule, ProductModalComponent, ProductListComponent],
   templateUrl: './self-order.component.html',
   styleUrls: ['./self-order.component.css']
 })
 export class SelfOrderComponent implements OnInit {
   products: any[] = [];
   categories: any[] = [];
-  productDetails: any[] = [];
   customerName = 'Guest';
   paymentTypeId = 1;
 
@@ -47,21 +47,12 @@ export class SelfOrderComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadProducts();
-    this.loadProductDetails();
   }
 
   loadCategories() {
     this.loadingService.start();
     this.categoryService.getCategories().subscribe({
       next: res => { this.categories = res; this.loadingService.stop(); },
-      error: () => this.loadingService.stop()
-    });
-  }
-
-  loadProductDetails() {
-    this.loadingService.start();
-    this.productService.getProductDetails().subscribe({
-      next: res => { this.productDetails = res; this.loadingService.stop(); },
       error: () => this.loadingService.stop()
     });
   }
@@ -140,13 +131,9 @@ export class SelfOrderComponent implements OnInit {
     }
   }
 
-  filteredProductsWithSizes(productId: number): any[] {
-    return this.productDetails.filter(p => p.productId === productId);
-  }
-
-  openProductModal(product: any) {
-    this.selectedProductListWithSizes = this.filteredProductsWithSizes(product.id);
-    this.selectedProduct = product;
+  onProductSelected(event: { product: any; variants: any[] }) {
+    this.selectedProduct = event.product;
+    this.selectedProductListWithSizes = event.variants;
   }
 
   closeModal() {

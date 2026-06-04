@@ -470,10 +470,6 @@
   .pos-product-grid {
     flex: 1;
     overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 14px;
-    align-content: start;
     scrollbar-width: thin;
     scrollbar-color: #ccc transparent;
   }
