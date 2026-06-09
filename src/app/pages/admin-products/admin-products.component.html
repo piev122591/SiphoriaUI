@@ -5,6 +5,10 @@
       <span class="page-tag">Catalogue</span>
       <h1 class="page-title">Products</h1>
     </div>
+    <button class="btn-add-product" (click)="openAddModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Product
+    </button>
   </div>
 
   <!-- CATEGORY FILTER -->
@@ -34,6 +38,7 @@
           <th>Name</th>
           <th>Category</th>
           <th>Sizes</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -54,11 +59,17 @@
                 <span class="chevron" [class.open]="expandedProductId === p.id">▾</span>
               </button>
             </td>
+            <td class="action-cell">
+              <button class="btn-add-variant-row" (click)="openAddVariant(p.id)" title="Add variant">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Variant
+              </button>
+            </td>
           </tr>
 
           <!-- Detail row -->
           <tr class="detail-row" *ngIf="expandedProductId === p.id">
-            <td colspan="4" class="detail-cell">
+            <td colspan="5" class="detail-cell">
               <div class="detail-panel">
                 <div class="detail-panel-header">
                   <span class="detail-panel-title">Sizes & Pricing</span>
@@ -68,9 +79,35 @@
                 <div class="variant-cards">
                   <div class="variant-card" *ngFor="let v of getVariants(p.id)">
                     <span class="variant-size">{{ v.size }} oz</span>
-                    <span class="variant-price">₱{{ v.price }}</span>
+
+                    <ng-container *ngIf="editingVariantId === v.id; else priceDisplay">
+                      <div class="price-edit">
+                        <span class="price-prefix">₱</span>
+                        <input
+                          class="price-input"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          [(ngModel)]="editingPrice"
+                          (keydown.enter)="savePrice(v)"
+                          (keydown.escape)="cancelEditPrice()"
+                        />
+                        <button class="btn-save" (click)="savePrice(v)" [disabled]="updatingVariantId === v.id" title="Save">
+                          {{ updatingVariantId === v.id ? '…' : '✓' }}
+                        </button>
+                        <button class="btn-cancel" (click)="cancelEditPrice()" [disabled]="updatingVariantId === v.id" title="Cancel">✕</button>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #priceDisplay>
+                      <span class="variant-price editable-price" (click)="startEditPrice(v)" title="Click to edit price">
+                        ₱{{ v.price }}
+                        <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </span>
+                    </ng-template>
                   </div>
                 </div>
+
 
               </div>
             </td>
@@ -80,7 +117,7 @@
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="4" class="table-footer">
+          <td colspan="5" class="table-footer">
             {{ filteredProducts.length }} product{{ filteredProducts.length !== 1 ? 's' : '' }}
           </td>
         </tr>
@@ -88,4 +125,90 @@
     </table>
   </div>
 
+</div>
+
+<!-- ADD VARIANT MODAL -->
+<div class="modal-overlay" *ngIf="addingVariantProductId !== null" (click)="cancelAddVariant()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Add Variant</h2>
+      <button class="modal-close" (click)="cancelAddVariant()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input form-input-readonly" type="text" [value]="getProductName(addingVariantProductId)" readonly />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input form-input-readonly" type="text" [value]="getProductCategory(addingVariantProductId)" readonly />
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">Size</label>
+        <select class="form-input" [(ngModel)]="newVariant.sizeid">
+          <option [ngValue]="null" disabled>Select a size</option>
+          <option *ngFor="let s of sizes" [ngValue]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Price (₱)</label>
+        <input class="form-input" type="number" min="0" step="0.01" placeholder="0.00" [(ngModel)]="newVariant.price" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Image URL</label>
+        <input class="form-input" type="text" placeholder="https://..." [(ngModel)]="newVariant.image_url" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cancelAddVariant()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmitVariant || savingVariant" (click)="saveNewVariant(addingVariantProductId!)">
+        {{ savingVariant ? 'Saving…' : 'Save Variant' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">New Product</h2>
+      <button class="modal-close" (click)="closeAddModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" type="text" placeholder="e.g. Classic Latte" [(ngModel)]="newProduct.name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input" [(ngModel)]="newProduct.categoryid">
+          <option [ngValue]="null" disabled>Select a category</option>
+          <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="closeAddModal()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmit || submitting" (click)="submitNewProduct()">
+        {{ submitting ? 'Saving…' : 'Save Product' }}
+      </button>
+    </div>
+
+  </div>
 </div>

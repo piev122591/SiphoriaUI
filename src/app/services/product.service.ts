@@ -31,4 +31,20 @@ export class ProductService {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
 
+  updateProductDetailPrice(id: number, price: number): Observable<any> {
+    return this.http.patch(`https://siphoriabackend-production.up.railway.app/productDetails/${id}/price`, { price });
+  }
+
+  createProduct(data: { name: string; categoryid: number }): Observable<any> {
+    return this.http.post('https://siphoriabackend-production.up.railway.app/products', data);
+  }
+
+  createProductDetail(data: { productid: number; sizeid: number; price: number; image_url?: string }): Observable<any> {
+    return this.http.post('https://siphoriabackend-production.up.railway.app/productDetails', data);
+  }
+
+  getSizes(): Observable<any> {
+    return this.http.get('https://siphoriabackend-production.up.railway.app/products/size');
+  }
+
 }

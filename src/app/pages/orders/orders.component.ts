@@ -18,6 +18,7 @@ export class OrdersComponent implements OnInit {
   errorMessage: string | null = null;
   expandedOrderId: number | null = null;
   loadingDetailId: number | null = null;
+  updatingStatusId: number | null = null;
 
   today = new Date().toISOString().split('T')[0];
   startDate = this.today;
@@ -94,10 +95,22 @@ export class OrdersComponent implements OnInit {
   }
 
   updateStatus(order: any, newStatusId: number) {
+    if (this.updatingStatusId === order.id || order.status_id === newStatusId) return;
+
     const prev = order.status_id;
     order.status_id = newStatusId;
+    this.updatingStatusId = order.id;
+    this.errorMessage = null;
+
     this.orderService.updateOrderStatus(order.id, newStatusId).subscribe({
-      error: () => { order.status_id = prev; }
+      next: () => {
+        this.updatingStatusId = null;
+      },
+      error: () => {
+        order.status_id = prev;
+        this.updatingStatusId = null;
+        this.errorMessage = 'Failed to update order status. Please try again.';
+      }
     });
   }
 

@@ -17,6 +17,7 @@ import { ProductListComponent } from './product-list/product-list.component';
 })
 export class SelfOrderComponent implements OnInit {
   products: any[] = [];
+  productDetails: any[] = [];
   categories: any[] = [];
   customerName = 'Guest';
   paymentTypeId = 1;
@@ -47,6 +48,7 @@ export class SelfOrderComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     this.loadProducts();
+    this.loadProductDetails();
   }
 
   loadCategories() {
@@ -65,8 +67,18 @@ export class SelfOrderComponent implements OnInit {
     });
   }
 
+  loadProductDetails() {
+    this.productService.getProductDetails().subscribe({
+      next: res => { this.productDetails = res; },
+      error: () => {}
+    });
+  }
+
   get filteredProducts() {
-    return this.products.filter(p => p.categoryid === this.selectedCategoryId);
+    return this.products.filter(p =>
+      p.categoryid === this.selectedCategoryId &&
+      this.productDetails.some((d: any) => d.productId === p.id)
+    );
   }
 
   selectCategory(category: any) {
