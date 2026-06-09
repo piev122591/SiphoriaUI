@@ -84,7 +84,7 @@
                 <span *ngIf="loadingDetailId === order.id" class="detail-loading">loading…</span>
               </button>
             </td>
-            <td class="total-cell" data-label="Total">{{ order.total }}</td>
+            <td class="total-cell" data-label="Total">₱{{ toPrice(order.total) }}</td>
             <td class="payment-cell" data-label="Payment">
               <ng-container *ngIf="getPaymentType(order.payment_type_id) as pt; else noPayment">
                 <img *ngIf="pt.logo" [src]="pt.logo" [alt]="pt.label" class="payment-logo" />
