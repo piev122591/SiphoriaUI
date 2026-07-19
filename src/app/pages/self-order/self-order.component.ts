@@ -5,6 +5,7 @@ import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { OrderService } from '../../services/order.service';
 import { LoadingService } from '../../services/loading.service';
+import { PrinterService } from '../../services/printer.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
 import { ProductListComponent } from './product-list/product-list.component';
 
@@ -42,7 +43,8 @@ export class SelfOrderComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private orderService: OrderService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private printerService: PrinterService
   ) {}
 
   ngOnInit(): void {
@@ -113,8 +115,9 @@ export class SelfOrderComponent implements OnInit {
     };
 
     this.orderService.placeOrder(payload).subscribe({
-      next: (_) => {
+      next: (response) => {
         this.isPlacingOrder = false;
+        this.printReceipt(response);
         this.cart = [];
         this.step = 1;
       },
@@ -122,6 +125,28 @@ export class SelfOrderComponent implements OnInit {
         this.isPlacingOrder = false;
         alert('Failed to place order. Please try again.');
       }
+    });
+  }
+
+  private printReceipt(orderResponse: any) {
+    const paymentType = this.paymentTypes.find(p => p.id === this.paymentTypeId)?.label ?? 'Cash';
+
+    this.printerService.printReceipt({
+      orderId: orderResponse?.id ?? orderResponse?.order_id ?? orderResponse?.orderId,
+      customerName: this.customerName,
+      paymentType,
+      items: this.cart.map(item => ({
+        name: item.name,
+        size: item.size,
+        qty: item.qty,
+        price: item.price
+      })),
+      total: this.getCartTotal()
+    }).catch((err) => {
+      // Order is already placed successfully; a print failure (e.g. QZ Tray
+      // not running) shouldn't block the customer/cashier flow.
+      const reason = err?.message ?? String(err);
+      alert(`Order placed, but the receipt could not be printed.\nReason: ${reason}`);
     });
   }
 

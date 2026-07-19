@@ -1,0 +1,352 @@
+.settings-page {
+  padding: 40px 36px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #f8f3ed;
+}
+
+
+/* ===========================
+   HEADER
+   =========================== */
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.page-tag {
+  display: block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  margin-bottom: 6px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0;
+}
+
+
+/* ===========================
+   CARD
+   =========================== */
+
+.settings-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(44, 24, 16, 0.06);
+  padding: 28px 30px;
+  max-width: 640px;
+  margin-bottom: 24px;
+}
+
+.card-header-text code {
+  background: #f0ece8;
+  color: #8a5a2e;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0e8de;
+}
+
+.card-header-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0 0 6px;
+}
+
+.card-header-text p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  color: #a08060;
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+
+/* ===========================
+   STATUS BADGE
+   =========================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-connected    { background: #eaf6ee; color: #2e7d4f; }
+.status-connecting   { background: #fef6e4; color: #b07d1a; }
+.status-error        { background: #fdecea; color: #c0392b; }
+.status-disconnected { background: #f0ece8; color: #888; }
+
+.status-connecting .status-dot {
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+
+/* ===========================
+   INFO GRID
+   =========================== */
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #fdfaf7;
+  border-radius: 6px;
+}
+
+.info-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #b0a090;
+}
+
+.info-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #2c1810;
+}
+
+
+/* ===========================
+   ERROR BOX
+   =========================== */
+
+.error-box {
+  background: #fdecea;
+  border: 1px solid rgba(192, 57, 43, 0.2);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  color: #c0392b;
+  line-height: 1.5;
+}
+
+.error-hint {
+  margin: 6px 0 0;
+  color: #a8433a;
+  font-size: 0.78rem;
+}
+
+
+/* ===========================
+   ACTIONS
+   =========================== */
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action-row button {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+}
+
+.action-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #c9a96e;
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #b8924f;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #5c3d2e;
+  border: 1px solid #e0d6cc !important;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: #c9a96e !important;
+  background: #fdfaf7;
+}
+
+.btn-test {
+  background: #2c1810;
+  color: #ffffff;
+  margin-left: auto;
+}
+
+.btn-test:hover:not(:disabled) {
+  background: #4a2a1a;
+}
+
+
+/* ===========================
+   TEST FEEDBACK
+   =========================== */
+
+.test-feedback {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 14px 0 0;
+}
+
+.test-success { color: #2e7d4f; }
+.test-failed  { color: #c0392b; }
+
+
+/* ===========================
+   PRINTER LIST
+   =========================== */
+
+.hint-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  color: #b0a090;
+  margin: 10px 0 0;
+}
+
+.printer-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.printer-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #fdfaf7;
+  border: 1px solid #f0e8de;
+  border-radius: 6px;
+}
+
+.printer-list li.is-active {
+  border-color: #c9a96e;
+  background: rgba(201, 169, 110, 0.08);
+}
+
+.printer-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #2c1810;
+  word-break: break-word;
+}
+
+.printer-tag {
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #c9a96e;
+  background: rgba(201, 169, 110, 0.15);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.printer-empty {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  color: #b0a090;
+  justify-content: center;
+}
+
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 640px) {
+  .settings-page {
+    padding: 20px 14px;
+  }
+
+  .settings-card {
+    padding: 20px;
+    max-width: none;
+  }
+
+  .card-header {
+    flex-direction: column;
+  }
+
+  .btn-test {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .action-row button {
+    flex: 1;
+    min-width: 130px;
+  }
+}

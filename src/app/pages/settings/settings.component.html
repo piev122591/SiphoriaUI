@@ -1,0 +1,83 @@
+<div class="settings-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Configuration</span>
+      <h1 class="page-title">Settings</h1>
+    </div>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-header">
+      <div class="card-header-text">
+        <h2>Thermal Printer</h2>
+        <p>Connection to the receipt printer via QZ Tray. Receipts print automatically once an order is placed.</p>
+      </div>
+      <span class="status-badge" [ngClass]="'status-' + status">
+        <span class="status-dot"></span>
+        {{ statusLabel }}
+      </span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-row">
+        <span class="info-label">Detected Printer</span>
+        <span class="info-value">{{ printerName || '—' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">QZ Tray Version</span>
+        <span class="info-value">{{ qzVersion || '—' }}</span>
+      </div>
+    </div>
+
+    <div class="error-box" *ngIf="status === 'error' && lastError">
+      <strong>Last error:</strong> {{ lastError }}
+      <p class="error-hint">
+        Make sure QZ Tray is installed and running (look for its icon in the Windows system tray, near the clock),
+        then click "Check Connection" again.
+      </p>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-primary" (click)="checkConnection()" [disabled]="isBusy">
+        {{ isBusy ? 'Checking…' : 'Check Connection' }}
+      </button>
+      <button class="btn-secondary" (click)="restartConnection()" [disabled]="isBusy">
+        Restart Connection
+      </button>
+      <button class="btn-secondary" (click)="disconnect()" [disabled]="isBusy || status === 'disconnected'">
+        Disconnect
+      </button>
+      <button class="btn-test" (click)="sendTestPrint()" [disabled]="isBusy || status !== 'connected' || testPrintState === 'sending'">
+        {{ testPrintState === 'sending' ? 'Printing…' : 'Print Test Receipt' }}
+      </button>
+    </div>
+
+    <p class="test-feedback test-success" *ngIf="testPrintState === 'sent'">✓ Test receipt sent to the printer.</p>
+    <p class="test-feedback test-failed" *ngIf="testPrintState === 'failed'">✕ Test print failed — see the error above.</p>
+  </div>
+
+  <div class="settings-card">
+    <div class="card-header">
+      <div class="card-header-text">
+        <h2>Available Printers</h2>
+        <p>Every printer QZ Tray can see on this machine. Find your thermal printer's exact name here, then set it as <code>PRINTER_NAME</code> in <code>printer.service.ts</code>.</p>
+      </div>
+    </div>
+
+    <button class="btn-secondary" (click)="loadAvailablePrinters()" [disabled]="loadingPrinters || status !== 'connected'">
+      {{ loadingPrinters ? 'Listing…' : 'List Available Printers' }}
+    </button>
+
+    <p class="hint-text" *ngIf="status !== 'connected'">Connect to QZ Tray first to list printers.</p>
+
+    <ul class="printer-list" *ngIf="printersLoaded">
+      <li *ngFor="let p of availablePrinters" [class.is-active]="p === printerName">
+        <span class="printer-name">{{ p }}</span>
+        <span class="printer-tag" *ngIf="p === printerName">currently used</span>
+      </li>
+      <li class="printer-empty" *ngIf="availablePrinters.length === 0">No printers found by QZ Tray.</li>
+    </ul>
+  </div>
+
+</div>

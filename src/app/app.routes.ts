@@ -6,6 +6,7 @@ import { SelfOrderComponent } from './pages/self-order/self-order.component';
 import { AdminLayoutComponent } from './pages/admin-layout/admin-layout.component';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { AdminProductsComponent } from './pages/admin-products/admin-products.component';
+import { SettingsComponent } from './pages/settings/settings.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -33,7 +34,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'orders', pathMatch: 'full' },
       { path: 'menu', component: SelfOrderComponent },
       { path: 'orders', component: OrdersComponent },
-      { path: 'products', component: AdminProductsComponent }
+      { path: 'products', component: AdminProductsComponent },
+      { path: 'settings', component: SettingsComponent }
     ]
   },
   {
