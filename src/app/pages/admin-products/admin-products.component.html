@@ -78,7 +78,12 @@
 
                 <div class="variant-cards">
                   <div class="variant-card" *ngFor="let v of getVariants(p.id)">
-                    <span class="variant-size">{{ v.size }} oz</span>
+                    <div class="variant-card-top">
+                      <span class="variant-size">{{ v.size }} oz</span>
+                      <button class="btn-edit-variant" (click)="openEditVariant(v)" title="Edit variant">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </button>
+                    </div>
 
                     <ng-container *ngIf="editingVariantId === v.id; else priceDisplay">
                       <div class="price-edit">
@@ -163,15 +168,98 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Image URL</label>
-        <input class="form-input" type="text" placeholder="https://..." [(ngModel)]="newVariant.image_url" />
+        <label class="form-label">Image Folder</label>
+        <select class="form-input" [ngModel]="newVariant.imageFolder" (ngModelChange)="onNewVariantFolderChange($event)">
+          <option [ngValue]="null">No image</option>
+          <option *ngFor="let f of imageFolders" [ngValue]="f">{{ f }}</option>
+        </select>
       </div>
+
+      <div class="form-group" *ngIf="newVariant.imageFolder">
+        <label class="form-label">Image File</label>
+        <select class="form-input" [(ngModel)]="newVariant.imageFile">
+          <option [ngValue]="null" disabled>Select an image</option>
+          <option *ngFor="let img of getImageFiles(newVariant.imageFolder)" [ngValue]="img">{{ img }}</option>
+        </select>
+      </div>
+
+      <img *ngIf="newVariant.imageFolder && newVariant.imageFile"
+           class="image-pick-preview"
+           [src]="'/' + composeImagePath(newVariant.imageFolder, newVariant.imageFile)"
+           alt="Preview" />
     </div>
 
     <div class="modal-footer">
       <button class="btn-modal-cancel" (click)="cancelAddVariant()">Cancel</button>
       <button class="btn-modal-save" [disabled]="!canSubmitVariant || savingVariant" (click)="saveNewVariant(addingVariantProductId!)">
         {{ savingVariant ? 'Saving…' : 'Save Variant' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT VARIANT MODAL -->
+<div class="modal-overlay" *ngIf="editingVariant !== null" (click)="cancelEditVariant()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Variant</h2>
+      <button class="modal-close" (click)="cancelEditVariant()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input form-input-readonly" type="text" [value]="getProductName(editingVariant?.productId)" readonly />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input form-input-readonly" type="text" [value]="getProductCategory(editingVariant?.productId)" readonly />
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-group">
+        <label class="form-label">Size</label>
+        <select class="form-input" [(ngModel)]="editVariantForm.sizeid">
+          <option [ngValue]="null" disabled>Select a size</option>
+          <option *ngFor="let s of sizes" [ngValue]="s.id">{{ s.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Price (₱)</label>
+        <input class="form-input" type="number" min="0" step="0.01" placeholder="0.00" [(ngModel)]="editVariantForm.price" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Image Folder</label>
+        <select class="form-input" [ngModel]="editVariantForm.imageFolder" (ngModelChange)="onEditVariantFolderChange($event)">
+          <option [ngValue]="null">No image</option>
+          <option *ngFor="let f of imageFolders" [ngValue]="f">{{ f }}</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="editVariantForm.imageFolder">
+        <label class="form-label">Image File</label>
+        <select class="form-input" [(ngModel)]="editVariantForm.imageFile">
+          <option [ngValue]="null" disabled>Select an image</option>
+          <option *ngFor="let img of getImageFiles(editVariantForm.imageFolder)" [ngValue]="img">{{ img }}</option>
+        </select>
+      </div>
+
+      <img *ngIf="editVariantForm.imageFolder && editVariantForm.imageFile"
+           class="image-pick-preview"
+           [src]="'/' + composeImagePath(editVariantForm.imageFolder, editVariantForm.imageFile)"
+           alt="Preview" />
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cancelEditVariant()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmitEditVariant || savingEditVariant" (click)="saveEditVariant()">
+        {{ savingEditVariant ? 'Saving…' : 'Save Changes' }}
       </button>
     </div>
 

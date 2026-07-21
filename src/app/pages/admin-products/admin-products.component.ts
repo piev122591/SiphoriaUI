@@ -27,9 +27,42 @@ export class AdminProductsComponent implements OnInit {
   submitting = false;
   newProduct = { name: '', categoryid: null as number | null };
 
+  // Static catalogue of product image folders/files under public/products.
+  // Update this map when images are added to/removed from those folders.
+  readonly productImageMap: Record<string, string[]> = {
+    signatureCoffee: ['RaspberryLatte.jpg', 'ThaiTeaLatte.jpg', 'UbeLatte.jpg'],
+    classicCoffee: ['SpanishLatte.jpg'],
+    matchaSeries: ['DirtyMatcha.jpg', 'MatchaLatte.jpg', 'StrawberryMatcha.jpg']
+  };
+
+  get imageFolders(): string[] {
+    return Object.keys(this.productImageMap);
+  }
+
+  getImageFiles(folder: string | null): string[] {
+    return folder ? (this.productImageMap[folder] || []) : [];
+  }
+
+  composeImagePath(folder: string | null, file: string | null): string {
+    return folder && file ? `products/${folder}/${file}` : '';
+  }
+
+  private parseImagePath(path: string | null | undefined): { folder: string | null; file: string | null } {
+    if (!path) return { folder: null, file: null };
+    const parts = path.split('/');
+    if (parts.length !== 3 || parts[0] !== 'products') return { folder: null, file: null };
+    return { folder: parts[1], file: parts[2] };
+  }
+
   addingVariantProductId: number | null = null;
-  newVariant: { sizeid: number | null; price: number | null; image_url: string } = { sizeid: null, price: null, image_url: '' };
+  newVariant: { sizeid: number | null; price: number | null; imageFolder: string | null; imageFile: string | null } =
+    { sizeid: null, price: null, imageFolder: null, imageFile: null };
   savingVariant = false;
+
+  editingVariant: any = null;
+  editVariantForm: { sizeid: number | null; price: number | null; imageFolder: string | null; imageFile: string | null } =
+    { sizeid: null, price: null, imageFolder: null, imageFile: null };
+  savingEditVariant = false;
 
   constructor(
     private productService: ProductService,
@@ -143,12 +176,17 @@ export class AdminProductsComponent implements OnInit {
 
   openAddVariant(productId: number) {
     this.addingVariantProductId = productId;
-    this.newVariant = { sizeid: null, price: null, image_url: '' };
+    this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
   }
 
   cancelAddVariant() {
     this.addingVariantProductId = null;
-    this.newVariant = { sizeid: null, price: null, image_url: '' };
+    this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+  }
+
+  onNewVariantFolderChange(folder: string | null) {
+    this.newVariant.imageFolder = folder;
+    this.newVariant.imageFile = null;
   }
 
   saveNewVariant(productId: number) {
@@ -159,15 +197,61 @@ export class AdminProductsComponent implements OnInit {
       productid: productId,
       sizeid: this.newVariant.sizeid!,
       price: this.newVariant.price!,
-      image_url: this.newVariant.image_url
+      image_url: this.composeImagePath(this.newVariant.imageFolder, this.newVariant.imageFile)
     }).subscribe({
       next: () => {
         this.loadProductDetails();
         this.savingVariant = false;
         this.addingVariantProductId = null;
-        this.newVariant = { sizeid: null, price: null, image_url: '' };
+        this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
       },
       error: () => { this.savingVariant = false; }
+    });
+  }
+
+  get canSubmitEditVariant(): boolean {
+    return !!this.editVariantForm.sizeid && this.editVariantForm.price !== null;
+  }
+
+  openEditVariant(v: any) {
+    this.editingVariant = v;
+    const matchedSize = this.sizes.find(s => s.name === v.size);
+    const { folder, file } = this.parseImagePath(v.image_url);
+    this.editVariantForm = {
+      sizeid: matchedSize ? matchedSize.id : null,
+      price: parseFloat(v.price),
+      imageFolder: folder,
+      imageFile: file
+    };
+  }
+
+  cancelEditVariant() {
+    this.editingVariant = null;
+    this.editVariantForm = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+  }
+
+  onEditVariantFolderChange(folder: string | null) {
+    this.editVariantForm.imageFolder = folder;
+    this.editVariantForm.imageFile = null;
+  }
+
+  saveEditVariant() {
+    if (this.savingEditVariant || !this.canSubmitEditVariant || !this.editingVariant) return;
+    this.savingEditVariant = true;
+
+    this.productService.updateProductDetail(this.editingVariant.id, {
+      productid: this.editingVariant.productId,
+      sizeid: this.editVariantForm.sizeid!,
+      price: this.editVariantForm.price!,
+      image_url: this.composeImagePath(this.editVariantForm.imageFolder, this.editVariantForm.imageFile)
+    }).subscribe({
+      next: () => {
+        this.loadProductDetails();
+        this.savingEditVariant = false;
+        this.editingVariant = null;
+        this.editVariantForm = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+      },
+      error: () => { this.savingEditVariant = false; }
     });
   }
 

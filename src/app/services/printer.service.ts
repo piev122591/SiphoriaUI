@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as qz from 'qz-tray';
+import { KEYUTIL, KJUR, hextorstr, stob64 } from 'jsrsasign';
+import { QZ_CERTIFICATE, QZ_PRIVATE_KEY } from './qz-tray-security';
 
 export interface ReceiptItem {
   name: string;
@@ -57,6 +59,29 @@ export class PrinterService {
 
   constructor() {
     const lib = this.qz();
+
+    // Identify this app to QZ Tray with a signed certificate so the
+    // "Action Required" dialog shows "Siphoria" (Valid signature/certificate)
+    // instead of an anonymous, untrusted request. See qz-tray-security.ts.
+    lib.security.setCertificatePromise((resolve: (cert: string) => void) => {
+      resolve(QZ_CERTIFICATE);
+    });
+    lib.security.setSignatureAlgorithm('SHA512');
+    lib.security.setSignaturePromise((toSign: string) => {
+      return (resolve: (sig: string) => void, reject: (err: unknown) => void) => {
+        try {
+          const privateKey = KEYUTIL.getKey(QZ_PRIVATE_KEY);
+          const sig = new KJUR.crypto.Signature({ alg: 'SHA512withRSA' });
+          sig.init(privateKey as any);
+          sig.updateString(toSign);
+          const hex = sig.sign();
+          resolve(stob64(hextorstr(hex)));
+        } catch (err) {
+          reject(err);
+        }
+      };
+    });
+
     lib.websocket.setClosedCallbacks(() => {
       this.connectPromise = null;
       this.printerNameSubject.next(null);
