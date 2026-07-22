@@ -49,6 +49,14 @@ export class AdminProductsComponent implements OnInit {
     return folder && file ? `products/${folder}/${file}` : '';
   }
 
+  formatFolderLabel(folder: string): string {
+    return folder.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, c => c.toUpperCase());
+  }
+
+  formatFileLabel(file: string): string {
+    return file.replace(/\.[^.]+$/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
+  }
+
   private parseImagePath(path: string | null | undefined): { folder: string | null; file: string | null } {
     if (!path) return { folder: null, file: null };
     const parts = path.split('/');
