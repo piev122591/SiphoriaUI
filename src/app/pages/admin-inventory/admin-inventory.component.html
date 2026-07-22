@@ -1,0 +1,181 @@
+<div class="inventory-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Stock</span>
+      <h1 class="page-title">Inventory</h1>
+    </div>
+    <button class="btn-add-item" (click)="openAddModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Item
+    </button>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar">
+    <button class="cat-tab" [class.active]="filter === 'all'" (click)="setFilter('all')">All</button>
+    <button class="cat-tab" [class.active]="filter === 'low'" (click)="setFilter('low')">
+      Low Stock
+      <span class="low-count" *ngIf="lowStockCount > 0">{{ lowStockCount }}</span>
+    </button>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="state-box" *ngIf="filteredItems.length === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 7h-9m9 5H4m16 5h-9"/>
+      <circle cx="4" cy="7" r="1.5"/>
+      <circle cx="17" cy="12" r="1.5"/>
+      <circle cx="4" cy="17" r="1.5"/>
+    </svg>
+    <p>No inventory items found.</p>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap" *ngIf="filteredItems.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Unit</th>
+          <th>Stock (set)</th>
+          <th>Consumed</th>
+          <th>Remaining</th>
+          <th>Reorder Level</th>
+          <th>Updated</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems" [class.row-low]="isLowStock(item)">
+          <td class="name-cell" data-label="Name">
+            {{ item.name }}
+            <span class="low-badge" *ngIf="isLowStock(item)">Low</span>
+          </td>
+          <td data-label="Unit">{{ item.unit }}</td>
+
+          <td data-label="Stock (set)">
+            <ng-container *ngIf="restockingId === item.id; else stockDisplay">
+              <div class="restock-edit">
+                <input
+                  class="restock-input"
+                  type="number"
+                  min="0"
+                  step="1"
+                  [(ngModel)]="restockValue"
+                  (keydown.enter)="saveRestock(item)"
+                  (keydown.escape)="cancelRestock()"
+                />
+                <button class="btn-save" (click)="saveRestock(item)" [disabled]="savingRestock" title="Save">
+                  {{ savingRestock ? '…' : '✓' }}
+                </button>
+                <button class="btn-cancel" (click)="cancelRestock()" [disabled]="savingRestock" title="Cancel">✕</button>
+              </div>
+            </ng-container>
+            <ng-template #stockDisplay>
+              <span class="editable-stock" (click)="startRestock(item)" title="Click to restock">
+                {{ item.quantity }}
+                <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </span>
+            </ng-template>
+          </td>
+
+          <td data-label="Consumed">{{ item.consumed }}</td>
+          <td class="remaining-cell" data-label="Remaining" [class.remaining-low]="isLowStock(item)">{{ item.quantity_remaining }}</td>
+          <td data-label="Reorder Level">{{ item.reorder_level ?? '—' }}</td>
+          <td class="updated-cell" data-label="Updated">{{ item.updated_at | date:'MMM d, y, h:mm a' }}</td>
+          <td class="action-cell">
+            <button class="btn-edit-item" (click)="openEditItem(item)" title="Edit item">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="8" class="table-footer">
+            {{ filteredItems.length }} item{{ filteredItems.length !== 1 ? 's' : '' }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+</div>
+
+<!-- ADD ITEM MODAL -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">New Inventory Item</h2>
+      <button class="modal-close" (click)="closeAddModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input class="form-input" type="text" placeholder="e.g. 16oz Cup" [(ngModel)]="newItem.name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Unit</label>
+        <input class="form-input" type="text" placeholder="pcs" [(ngModel)]="newItem.unit" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Initial Stock</label>
+        <input class="form-input" type="number" min="0" step="1" placeholder="0" [(ngModel)]="newItem.quantity" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Reorder Level</label>
+        <input class="form-input" type="number" min="0" step="1" placeholder="0" [(ngModel)]="newItem.reorder_level" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="closeAddModal()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmit || submitting" (click)="submitNewItem()">
+        {{ submitting ? 'Saving…' : 'Save Item' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT ITEM MODAL -->
+<div class="modal-overlay" *ngIf="editingItem !== null" (click)="cancelEditItem()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Item</h2>
+      <button class="modal-close" (click)="cancelEditItem()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input class="form-input" type="text" [(ngModel)]="editForm.name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Unit</label>
+        <input class="form-input" type="text" [(ngModel)]="editForm.unit" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Reorder Level</label>
+        <input class="form-input" type="number" min="0" step="1" [(ngModel)]="editForm.reorder_level" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cancelEditItem()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmitEdit || savingEdit" (click)="saveEditItem()">
+        {{ savingEdit ? 'Saving…' : 'Save Changes' }}
+      </button>
+    </div>
+
+  </div>
+</div>

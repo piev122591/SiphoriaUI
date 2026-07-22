@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { LoadingService } from '../../services/loading.service';
+import { InventoryService } from '../../services/inventory.service';
 
 @Component({
   selector: 'app-admin-products',
@@ -31,8 +32,9 @@ export class AdminProductsComponent implements OnInit {
   // Update this map when images are added to/removed from those folders.
   readonly productImageMap: Record<string, string[]> = {
     signatureCoffee: ['RaspberryLatte.jpg', 'ThaiTeaLatte.jpg', 'UbeLatte.jpg'],
-    classicCoffee: ['SpanishLatte.jpg'],
-    matchaSeries: ['DirtyMatcha.jpg', 'MatchaLatte.jpg', 'StrawberryMatcha.jpg']
+    classicCoffee: ['CaramelMacchiato.jpg', 'SpanishLatte.jpg', 'WhiteChocolateMocha.jpg'],
+    matchaSeries: ['DirtyMatcha.jpg', 'MatchaLatte.jpg', 'StrawberryMatcha.jpg'],
+    milkBased: ['ChocoOverload.jpg', 'CocoaTaroMilk.jpg', 'MochaStrawberryMilk.jpg', 'StrawberryBiscoffLatte.jpg']
   };
 
   get imageFolders(): string[] {
@@ -64,10 +66,24 @@ export class AdminProductsComponent implements OnInit {
     { sizeid: null, price: null, imageFolder: null, imageFile: null };
   savingEditVariant = false;
 
+  // RECIPE (inventory usage per size-SKU)
+  inventoryItems: any[] = [];
+  recipeVariant: any = null;
+  recipeLines: any[] = [];
+  loadingRecipe = false;
+  newRecipeInventoryId: number | null = null;
+  newRecipeQty: number | null = 1;
+  savingRecipeLine = false;
+  editingRecipeInventoryId: number | null = null;
+  editingRecipeQty: number | null = null;
+  updatingRecipeInventoryId: number | null = null;
+  removingRecipeInventoryId: number | null = null;
+
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private inventoryService: InventoryService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +91,107 @@ export class AdminProductsComponent implements OnInit {
     this.loadProducts();
     this.loadProductDetails();
     this.loadSizes();
+    this.loadInventoryItems();
+  }
+
+  loadInventoryItems() {
+    this.inventoryService.getInventory().subscribe({
+      next: res => { this.inventoryItems = res; },
+      error: () => {}
+    });
+  }
+
+  getInventoryName(inventoryId: number): string {
+    const item = this.inventoryItems.find(i => i.id === inventoryId);
+    return item ? item.name : '—';
+  }
+
+  get availableInventoryItems(): any[] {
+    const usedIds = new Set(this.recipeLines.map(l => l.inventory_id));
+    return this.inventoryItems.filter(i => !usedIds.has(i.id));
+  }
+
+  openRecipeModal(v: any) {
+    this.recipeVariant = v;
+    this.recipeLines = [];
+    this.newRecipeInventoryId = null;
+    this.newRecipeQty = 1;
+    this.loadRecipe(v.id);
+  }
+
+  closeRecipeModal() {
+    this.recipeVariant = null;
+    this.recipeLines = [];
+    this.editingRecipeInventoryId = null;
+    this.editingRecipeQty = null;
+  }
+
+  loadRecipe(productDetailsId: number) {
+    this.loadingRecipe = true;
+    this.inventoryService.getRecipe(productDetailsId).subscribe({
+      next: res => { this.recipeLines = res; this.loadingRecipe = false; },
+      error: () => { this.loadingRecipe = false; }
+    });
+  }
+
+  get canAddRecipeLine(): boolean {
+    return !!this.newRecipeInventoryId && !!this.newRecipeQty && this.newRecipeQty > 0;
+  }
+
+  addRecipeLine() {
+    if (!this.canAddRecipeLine || this.savingRecipeLine || !this.recipeVariant) return;
+    this.savingRecipeLine = true;
+
+    this.inventoryService.addRecipeItem(this.recipeVariant.id, {
+      inventory_id: this.newRecipeInventoryId!,
+      quantity_used: this.newRecipeQty!
+    }).subscribe({
+      next: () => {
+        this.loadRecipe(this.recipeVariant.id);
+        this.savingRecipeLine = false;
+        this.newRecipeInventoryId = null;
+        this.newRecipeQty = 1;
+      },
+      error: () => { this.savingRecipeLine = false; }
+    });
+  }
+
+  startEditRecipeQty(line: any) {
+    this.editingRecipeInventoryId = line.inventory_id;
+    this.editingRecipeQty = line.quantity_used;
+  }
+
+  cancelEditRecipeQty() {
+    this.editingRecipeInventoryId = null;
+    this.editingRecipeQty = null;
+  }
+
+  saveRecipeQty(line: any) {
+    if (this.updatingRecipeInventoryId === line.inventory_id || this.editingRecipeQty === null || !this.recipeVariant) return;
+    this.updatingRecipeInventoryId = line.inventory_id;
+
+    this.inventoryService.updateRecipeItem(this.recipeVariant.id, line.inventory_id, this.editingRecipeQty).subscribe({
+      next: () => {
+        line.quantity_used = this.editingRecipeQty;
+        this.editingRecipeInventoryId = null;
+        this.editingRecipeQty = null;
+        this.updatingRecipeInventoryId = null;
+      },
+      error: () => { this.updatingRecipeInventoryId = null; }
+    });
+  }
+
+  removeRecipeLine(line: any) {
+    if (this.removingRecipeInventoryId === line.inventory_id || !this.recipeVariant) return;
+    this.removingRecipeInventoryId = line.inventory_id;
+
+    this.inventoryService.deleteRecipeItem(this.recipeVariant.id, line.inventory_id).subscribe({
+      next: () => {
+        this.recipeLines = this.recipeLines.filter(l => l.inventory_id !== line.inventory_id);
+        this.removingRecipeInventoryId = null;
+      },
+      error: () => { this.removingRecipeInventoryId = null; }
+    });
   }
 
   loadCategories() {

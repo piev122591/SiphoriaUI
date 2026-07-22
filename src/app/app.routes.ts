@@ -6,6 +6,7 @@ import { SelfOrderComponent } from './pages/self-order/self-order.component';
 import { AdminLayoutComponent } from './pages/admin-layout/admin-layout.component';
 import { OrdersComponent } from './pages/orders/orders.component';
 import { AdminProductsComponent } from './pages/admin-products/admin-products.component';
+import { AdminInventoryComponent } from './pages/admin-inventory/admin-inventory.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { authGuard } from './guards/auth.guard';
 
@@ -35,6 +36,7 @@ export const routes: Routes = [
       { path: 'menu', component: SelfOrderComponent },
       { path: 'orders', component: OrdersComponent },
       { path: 'products', component: AdminProductsComponent },
+      { path: 'inventory', component: AdminInventoryComponent },
       { path: 'settings', component: SettingsComponent }
     ]
   },

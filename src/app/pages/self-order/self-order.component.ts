@@ -108,7 +108,7 @@ export class SelfOrderComponent implements OnInit {
       status_id: this.statusId,
       remarks: this.remarks,
       order_details: this.cart.map(item => ({
-        product_details_id: item.productId,
+        product_details_id: item.id,
         qty: item.qty,
         price: item.price
       }))
