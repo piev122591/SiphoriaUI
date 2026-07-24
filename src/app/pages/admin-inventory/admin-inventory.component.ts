@@ -24,9 +24,18 @@ export class AdminInventoryComponent implements OnInit {
   editForm: { name: string; unit: string; reorder_level: number | null } = { name: '', unit: 'pcs', reorder_level: null };
   savingEdit = false;
 
-  restockingId: number | null = null;
-  restockValue: number | null = null;
-  savingRestock = false;
+  stockingItem: any = null;
+  stockForm: { quantity: number | null; note: string } = { quantity: null, note: '' };
+  savingStock = false;
+
+  historyItem: any = null;
+  historyEntries: any[] = [];
+  loadingHistory = false;
+
+  editingDetailId: number | null = null;
+  editDetailForm: { quantity: number | null; note: string } = { quantity: null, note: '' };
+  savingDetailEdit = false;
+  deletingDetailId: number | null = null;
 
   constructor(
     private inventoryService: InventoryService,
@@ -128,28 +137,99 @@ export class AdminInventoryComponent implements OnInit {
     });
   }
 
-  startRestock(item: any) {
-    this.restockingId = item.id;
-    this.restockValue = item.quantity;
+  openStockModal(item: any) {
+    this.stockingItem = item;
+    this.stockForm = { quantity: null, note: '' };
   }
 
-  cancelRestock() {
-    this.restockingId = null;
-    this.restockValue = null;
+  closeStockModal() {
+    this.stockingItem = null;
+    this.stockForm = { quantity: null, note: '' };
   }
 
-  saveRestock(item: any) {
-    if (this.savingRestock || this.restockValue === null) return;
-    this.savingRestock = true;
+  get canSubmitStock(): boolean {
+    return this.stockForm.quantity != null && this.stockForm.quantity > 0;
+  }
 
-    this.inventoryService.updateInventoryQuantity(item.id, this.restockValue).subscribe({
+  submitStock() {
+    if (!this.canSubmitStock || this.savingStock || !this.stockingItem) return;
+    this.savingStock = true;
+
+    this.inventoryService.addInventoryDetail(this.stockingItem.id, {
+      quantity: this.stockForm.quantity!,
+      note: this.stockForm.note.trim() || undefined
+    }).subscribe({
       next: () => {
         this.loadInventory();
-        this.savingRestock = false;
-        this.restockingId = null;
-        this.restockValue = null;
+        this.savingStock = false;
+        this.closeStockModal();
       },
-      error: () => { this.savingRestock = false; }
+      error: () => { this.savingStock = false; }
+    });
+  }
+
+  openHistory(item: any) {
+    this.historyItem = item;
+    this.historyEntries = [];
+    this.loadingHistory = true;
+
+    this.inventoryService.getInventoryDetails(item.id).subscribe({
+      next: res => { this.historyEntries = res; this.loadingHistory = false; },
+      error: () => { this.loadingHistory = false; }
+    });
+  }
+
+  closeHistory() {
+    this.historyItem = null;
+    this.historyEntries = [];
+    this.cancelEditDetail();
+    this.deletingDetailId = null;
+  }
+
+  startEditDetail(entry: any) {
+    this.editingDetailId = entry.id;
+    this.editDetailForm = { quantity: entry.quantity, note: entry.note || '' };
+  }
+
+  cancelEditDetail() {
+    this.editingDetailId = null;
+    this.editDetailForm = { quantity: null, note: '' };
+  }
+
+  get canSubmitDetailEdit(): boolean {
+    return this.editDetailForm.quantity != null && this.editDetailForm.quantity > 0;
+  }
+
+  saveEditDetail(entry: any) {
+    if (!this.canSubmitDetailEdit || this.savingDetailEdit || !this.historyItem) return;
+    this.savingDetailEdit = true;
+
+    this.inventoryService.updateInventoryDetail(this.historyItem.id, entry.id, {
+      quantity: this.editDetailForm.quantity!,
+      note: this.editDetailForm.note.trim()
+    }).subscribe({
+      next: updated => {
+        const idx = this.historyEntries.findIndex(e => e.id === entry.id);
+        if (idx !== -1) this.historyEntries[idx] = updated;
+        this.savingDetailEdit = false;
+        this.cancelEditDetail();
+        this.loadInventory();
+      },
+      error: () => { this.savingDetailEdit = false; }
+    });
+  }
+
+  deleteDetail(entry: any) {
+    if (this.deletingDetailId !== null || !this.historyItem) return;
+    this.deletingDetailId = entry.id;
+
+    this.inventoryService.deleteInventoryDetail(this.historyItem.id, entry.id).subscribe({
+      next: () => {
+        this.historyEntries = this.historyEntries.filter(e => e.id !== entry.id);
+        this.deletingDetailId = null;
+        this.loadInventory();
+      },
+      error: () => { this.deletingDetailId = null; }
     });
   }
 }

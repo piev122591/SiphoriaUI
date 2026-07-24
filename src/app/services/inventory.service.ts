@@ -19,8 +19,20 @@ export class InventoryService {
     return this.http.post(this.apiUrl, data);
   }
 
-  updateInventoryQuantity(id: number, quantity: number): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${id}/quantity`, { quantity });
+  getInventoryDetails(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}/details`);
+  }
+
+  addInventoryDetail(id: number, data: { quantity: number; note?: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/details`, data);
+  }
+
+  updateInventoryDetail(id: number, detailId: number, data: { quantity?: number; note?: string }): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/details/${detailId}`, data);
+  }
+
+  deleteInventoryDetail(id: number, detailId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}/details/${detailId}`);
   }
 
   updateInventory(id: number, data: { name: string; unit?: string; reorder_level?: number }): Observable<any> {

@@ -200,9 +200,13 @@ tfoot .table-footer {
   text-align: right;
   padding-right: 18px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
 }
 
-.btn-edit-item {
+.btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -217,90 +221,11 @@ tfoot .table-footer {
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.btn-edit-item:hover {
+.btn-icon:hover {
   background: rgba(201, 169, 110, 0.14);
   border-color: #c9a96e;
   color: #b07d1a;
 }
-
-/* RESTOCK / EDITABLE STOCK */
-
-.editable-stock {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  border-radius: 6px;
-  padding: 2px 6px;
-  font-weight: 600;
-  transition: background 0.15s, color 0.15s;
-}
-
-.editable-stock:hover {
-  background: rgba(201, 169, 110, 0.12);
-  color: #b07d1a;
-}
-
-.edit-icon {
-  opacity: 0;
-  color: #c9a96e;
-  transition: opacity 0.15s;
-  flex-shrink: 0;
-}
-
-.editable-stock:hover .edit-icon { opacity: 1; }
-
-.restock-edit {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.restock-input {
-  width: 72px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #2c1810;
-  border: 1.5px solid #c9a96e;
-  border-radius: 6px;
-  padding: 3px 6px;
-  background: #fef6e4;
-  outline: none;
-}
-
-.restock-input:focus { border-color: #b07d1a; }
-
-.btn-save,
-.btn-cancel {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.btn-save {
-  background: #c9a96e;
-  color: #fff;
-}
-
-.btn-save:hover:not(:disabled) { background: #b07d1a; }
-
-.btn-cancel {
-  background: rgba(44, 24, 16, 0.08);
-  color: #5c3d2e;
-}
-
-.btn-cancel:hover:not(:disabled) { background: rgba(44, 24, 16, 0.15); }
-
-.btn-save:disabled,
-.btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ADD ITEM BUTTON */
 
@@ -353,6 +278,10 @@ tfoot .table-footer {
   overflow: hidden;
 }
 
+.modal-wide {
+  max-width: 720px;
+}
+
 .modal-header {
   display: flex;
   align-items: center;
@@ -388,6 +317,7 @@ tfoot .table-footer {
 .modal-body {
   padding: 22px 28px;
   overflow-y: auto;
+  overflow-x: auto;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -467,6 +397,103 @@ tfoot .table-footer {
 
 .btn-modal-save:hover:not(:disabled) { background: #b07d1a; }
 .btn-modal-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* STOCK HISTORY */
+
+.history-loading,
+.history-empty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  color: #b0a090;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table thead th {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #b0a090;
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 1px solid #f0e8de;
+}
+
+.history-table tbody td {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #3a2418;
+  padding: 10px 6px;
+  border-bottom: 1px solid #f5ede4;
+}
+
+.history-table tbody tr:last-child td { border-bottom: none; }
+
+.history-qty {
+  font-weight: 700;
+  color: #4a9c6d;
+}
+
+.history-date {
+  color: #918070;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.history-actions {
+  text-align: left;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.btn-icon-danger {
+  border-color: rgba(224, 112, 96, 0.4);
+  color: #e07060;
+}
+
+.btn-icon-danger:hover {
+  background: rgba(224, 112, 96, 0.14);
+  border-color: #e07060;
+  color: #d15a45;
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.detail-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-edit-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #2c1810;
+  border: 1.5px solid #c9a96e;
+  border-radius: 6px;
+  padding: 5px 8px;
+  background: #fef6e4;
+  outline: none;
+}
+
+.history-edit-input:focus { border-color: #b07d1a; }
+
+.history-edit-qty { width: 80px; flex-shrink: 0; }
+.history-edit-note { flex: 1; min-width: 0; }
 
 /* RESPONSIVE */
 
