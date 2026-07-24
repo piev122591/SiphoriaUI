@@ -80,13 +80,13 @@
                 <div class="variant-list" *ngIf="getVariants(p.id).length > 0; else noVariants">
                   <div class="variant-item" *ngFor="let v of getVariants(p.id)">
 
-                    <img *ngIf="v.image_url" [src]="'/' + v.image_url" [alt]="v.size + ' oz'" class="variant-item-thumb" />
+                    <img *ngIf="v.image_url" [src]="'/' + v.image_url" [alt]="v.size | sizeLabel" class="variant-item-thumb" />
                     <div *ngIf="!v.image_url" class="variant-item-thumb variant-item-thumb-placeholder" aria-hidden="true">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
                     </div>
 
                     <div class="variant-item-main">
-                      <span class="variant-size">{{ v.size }} oz</span>
+                      <span class="variant-size">{{ v.size | sizeLabel }}</span>
 
                       <ng-container *ngIf="editingVariantId === v.id; else priceDisplay">
                         <div class="price-edit">
@@ -315,47 +315,52 @@
 
 <!-- RECIPE MODAL -->
 <div class="modal-overlay" *ngIf="recipeVariant !== null" (click)="closeRecipeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+  <div class="modal modal-recipe" (click)="$event.stopPropagation()">
 
-    <div class="modal-header">
-      <h2 class="modal-title">Recipe — {{ getProductName(recipeVariant.productId) }} ({{ recipeVariant.size }} oz)</h2>
+    <div class="modal-header modal-header-recipe">
+      <div class="recipe-heading">
+        <span class="recipe-eyebrow">Recipe</span>
+        <h2 class="modal-title">{{ getProductName(recipeVariant.productId) }}</h2>
+        <span class="recipe-size-badge">{{ recipeVariant.size | sizeLabel }}</span>
+      </div>
       <button class="modal-close" (click)="closeRecipeModal()">✕</button>
     </div>
 
     <div class="modal-body">
 
-      <div class="form-group" *ngIf="!loadingRecipe && recipeLines.length === 0">
-        <p class="form-label" style="text-transform:none;letter-spacing:normal;">No inventory items linked to this size yet.</p>
+      <div class="recipe-empty" *ngIf="!loadingRecipe && recipeLines.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        <p>No ingredients linked to this size yet — add one below.</p>
       </div>
 
-      <div class="variant-rows" *ngIf="recipeLines.length > 0">
-        <div class="variant-row" *ngFor="let line of recipeLines">
-          <div class="variant-row-field">
-            <span class="add-variant-label">{{ line.inventory_name }}</span>
-            <span class="form-label" style="text-transform:none;letter-spacing:normal;font-weight:400;">
-              {{ line.inventory_quantity_remaining }} {{ line.inventory_unit }} remaining
-            </span>
+      <div class="recipe-list" *ngIf="recipeLines.length > 0">
+        <div class="recipe-item" *ngFor="let line of recipeLines">
+          <div class="recipe-item-info">
+            <span class="recipe-item-name">{{ line.inventory_name }}</span>
+            <span class="recipe-item-stock">{{ line.inventory_quantity_remaining }} {{ line.inventory_unit }} in stock</span>
           </div>
 
           <ng-container *ngIf="editingRecipeInventoryId === line.inventory_id; else qtyDisplay">
-            <input
-              class="add-variant-input"
-              type="number"
-              min="0.01"
-              step="0.01"
-              [(ngModel)]="editingRecipeQty"
-              (keydown.enter)="saveRecipeQty(line)"
-              (keydown.escape)="cancelEditRecipeQty()"
-            />
-            <button class="btn-save" (click)="saveRecipeQty(line)" [disabled]="updatingRecipeInventoryId === line.inventory_id" title="Save">
-              {{ updatingRecipeInventoryId === line.inventory_id ? '…' : '✓' }}
-            </button>
-            <button class="btn-cancel" (click)="cancelEditRecipeQty()" [disabled]="updatingRecipeInventoryId === line.inventory_id" title="Cancel">✕</button>
+            <div class="price-edit">
+              <input
+                class="add-variant-input recipe-qty-input"
+                type="number"
+                min="0.01"
+                step="0.01"
+                [(ngModel)]="editingRecipeQty"
+                (keydown.enter)="saveRecipeQty(line)"
+                (keydown.escape)="cancelEditRecipeQty()"
+              />
+              <button class="btn-save" (click)="saveRecipeQty(line)" [disabled]="updatingRecipeInventoryId === line.inventory_id" title="Save">
+                {{ updatingRecipeInventoryId === line.inventory_id ? '…' : '✓' }}
+              </button>
+              <button class="btn-cancel" (click)="cancelEditRecipeQty()" [disabled]="updatingRecipeInventoryId === line.inventory_id" title="Cancel">✕</button>
+            </div>
           </ng-container>
 
           <ng-template #qtyDisplay>
-            <span class="editable-price" (click)="startEditRecipeQty(line)" title="Click to edit quantity used">
-              {{ line.quantity_used }} used
+            <span class="editable-price recipe-qty-display" (click)="startEditRecipeQty(line)" title="Click to edit quantity used">
+              <span class="recipe-qty-value">{{ line.quantity_used }}</span> {{ line.inventory_unit }} used
               <svg class="edit-icon" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </span>
           </ng-template>
@@ -366,22 +371,37 @@
         </div>
       </div>
 
-      <div class="form-divider"></div>
+      <div class="ingr-add-panel">
+        <div class="ingr-add-heading">
+          <span class="ingr-add-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+          <span class="ingr-add-heading-text">Add Ingredient</span>
+        </div>
 
-      <div class="add-variant-fields">
-        <div class="add-variant-field">
-          <span class="add-variant-label">Item</span>
-          <select class="form-input" [(ngModel)]="newRecipeInventoryId">
-            <option [ngValue]="null" disabled>Select an item</option>
-            <option *ngFor="let i of availableInventoryItems" [ngValue]="i.id">{{ i.name }}</option>
-          </select>
+        <div class="ingr-add-fields">
+          <div class="ingr-add-field">
+            <label class="ingr-add-label">Item</label>
+            <div class="ingr-add-control">
+              <select class="ingr-add-select" [(ngModel)]="newRecipeInventoryId">
+                <option [ngValue]="null" disabled>Select an item</option>
+                <option *ngFor="let i of availableInventoryItems" [ngValue]="i.id">{{ i.name }}</option>
+              </select>
+              <svg class="ingr-add-chevron" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+
+          <div class="ingr-add-field ingr-add-field-qty">
+            <label class="ingr-add-label">Qty Used</label>
+            <div class="ingr-add-control">
+              <input class="ingr-add-number" type="number" min="0.01" step="0.01" placeholder="0.00" [(ngModel)]="newRecipeQty" />
+            </div>
+          </div>
         </div>
-        <div class="add-variant-field">
-          <span class="add-variant-label">Qty Used</span>
-          <input class="add-variant-input" type="number" min="0.01" step="0.01" [(ngModel)]="newRecipeQty" />
-        </div>
-        <button class="btn-add-variant" [disabled]="!canAddRecipeLine || savingRecipeLine" (click)="addRecipeLine()">
-          {{ savingRecipeLine ? 'Adding…' : 'Add' }}
+
+        <button class="ingr-add-btn" [disabled]="!canAddRecipeLine || savingRecipeLine" (click)="addRecipeLine()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>{{ savingRecipeLine ? 'Adding…' : 'Add' }}</span>
         </button>
       </div>
 

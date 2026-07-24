@@ -24,7 +24,7 @@
           [class.active]="selectedSize === p.size"
           (click)="onSelectSize(p)"
         >
-          {{ p.size }} oz
+          {{ p.size | sizeLabel }}
         </button>
       </div>
     </div>

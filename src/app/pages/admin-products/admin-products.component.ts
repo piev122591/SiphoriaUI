@@ -5,11 +5,12 @@ import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { LoadingService } from '../../services/loading.service';
 import { InventoryService } from '../../services/inventory.service';
+import { SizeLabelPipe } from '../../pipes/size-label.pipe';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SizeLabelPipe],
   templateUrl: './admin-products.component.html',
   styleUrls: ['./admin-products.component.css']
 })

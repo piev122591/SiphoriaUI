@@ -47,7 +47,7 @@
       <div *ngFor="let item of cart" class="order-item">
         <div class="order-info">
           <div class="order-name">{{ item.name }}</div>
-          <div class="order-size" *ngIf="item.size">{{ item.size }} oz</div>
+          <div class="order-size" *ngIf="item.size">{{ item.size | sizeLabel }}</div>
           <div class="order-price">₱{{ item.price }}</div>
         </div>
         <div class="order-controls">
@@ -138,7 +138,7 @@
       <div *ngFor="let item of cart" class="order-item">
         <div class="order-info">
           <div class="order-name">{{ item.name }}</div>
-          <div class="order-size" *ngIf="item.size">{{ item.size }} oz</div>
+          <div class="order-size" *ngIf="item.size">{{ item.size | sizeLabel }}</div>
           <div class="order-price">₱{{ item.price }} each</div>
         </div>
         <div class="order-controls">

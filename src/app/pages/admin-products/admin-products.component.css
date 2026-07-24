@@ -306,28 +306,6 @@ tfoot .table-footer {
   border-top: 1px dashed rgba(201, 169, 110, 0.35);
 }
 
-.add-variant-fields {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.add-variant-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.add-variant-label {
-  font-family: 'Poppins', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #b0a090;
-}
-
 .add-variant-input {
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
@@ -800,18 +778,6 @@ tfoot .table-footer {
 
 select.form-input { cursor: pointer; }
 
-.form-section-label {
-  font-family: 'Poppins', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #c9a96e;
-  padding-bottom: 4px;
-  border-bottom: 1px solid #f0e8de;
-  margin-top: 4px;
-}
-
 .variant-rows {
   display: flex;
   flex-direction: column;
@@ -833,6 +799,120 @@ select.form-input { cursor: pointer; }
 
 .size-input { max-width: 90px; }
 
+/* RECIPE MODAL */
+
+.modal-recipe { max-width: 560px; }
+
+.modal-header-recipe { align-items: flex-start; }
+
+.recipe-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.recipe-eyebrow {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #c9a96e;
+}
+
+.recipe-heading .modal-title {
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.recipe-size-badge {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b07d1a;
+  background: rgba(201, 169, 110, 0.14);
+  padding: 3px 11px;
+  border-radius: 20px;
+}
+
+.recipe-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 30px 16px;
+  color: #a08060;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  text-align: center;
+  background: rgba(201, 169, 110, 0.06);
+  border-radius: 10px;
+}
+
+.recipe-empty p { margin: 0; }
+
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: #fff;
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(44, 24, 16, 0.05);
+}
+
+.recipe-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.recipe-item-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2c1810;
+}
+
+.recipe-item-stock {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  color: #a08060;
+}
+
+.recipe-qty-display {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5c3d2e;
+  white-space: nowrap;
+}
+
+.recipe-qty-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: #2c1810;
+}
+
+.recipe-qty-input { width: 64px; }
+
+@media (max-width: 480px) {
+  .recipe-item { flex-wrap: wrap; }
+  .recipe-qty-display { order: 1; }
+  .btn-remove-variant { order: 2; }
+}
+
 .btn-remove-variant {
   background: none;
   border: 1.5px solid #e0d6cc;
@@ -853,26 +933,175 @@ select.form-input { cursor: pointer; }
   background: rgba(224, 112, 96, 0.07);
 }
 
-.btn-add-variant {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: 1.5px dashed #c9a96e;
-  border-radius: 8px;
-  color: #c9a96e;
-  font-family: 'Poppins', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 7px 14px;
-  cursor: pointer;
-  align-self: flex-start;
-  transition: background 0.15s, color 0.15s;
+/* ADD INGREDIENT (recipe modal) */
+
+.ingr-add-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 16px;
+  background: linear-gradient(160deg, #fdfaf7 0%, #faf3eb 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.3);
+  border-radius: 12px;
 }
 
-.btn-add-variant:hover {
-  background: rgba(201, 169, 110, 0.08);
-  color: #b07d1a;
+.ingr-add-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0e8de;
+}
+
+.ingr-add-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #c9a96e;
+}
+
+.ingr-add-heading-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c9a96e;
+}
+
+.ingr-add-fields {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ingr-add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.ingr-add-field-qty {
+  flex: 0 1 112px;
+}
+
+.ingr-add-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #b0a090;
+}
+
+.ingr-add-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: #fdfaf7;
+  border: 1.5px solid #e0d6cc;
+  border-radius: 8px;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.ingr-add-control:focus-within {
+  border-color: #c9a96e;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.35);
+}
+
+.ingr-add-select {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2c1810;
+  cursor: pointer;
+}
+
+.ingr-add-select option[disabled] { color: #b0a090; }
+
+.ingr-add-chevron {
+  color: #b0a090;
+  flex-shrink: 0;
+}
+
+.ingr-add-number {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2c1810;
+}
+
+.ingr-add-number::-webkit-outer-spin-button,
+.ingr-add-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ingr-add-number[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.ingr-add-number::placeholder {
+  color: #c4b6a6;
+  font-weight: 500;
+}
+
+.ingr-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 20px;
+  background: #c9a96e;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(201, 169, 110, 0.3);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.ingr-add-btn:hover:not(:disabled) {
+  background: #b07d1a;
+  box-shadow: 0 4px 14px rgba(201, 169, 110, 0.4);
+}
+
+.ingr-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 480px) {
+  .ingr-add-fields { flex-direction: column; }
+  .ingr-add-field-qty { flex: 1 1 auto; }
 }
 
 .modal-footer {

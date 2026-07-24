@@ -8,11 +8,12 @@ import { LoadingService } from '../../services/loading.service';
 import { PrinterService } from '../../services/printer.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
 import { ProductListComponent } from './product-list/product-list.component';
+import { SizeLabelPipe } from '../../pipes/size-label.pipe';
 
 @Component({
   selector: 'app-self-order',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductModalComponent, ProductListComponent],
+  imports: [CommonModule, FormsModule, ProductModalComponent, ProductListComponent, SizeLabelPipe],
   templateUrl: './self-order.component.html',
   styleUrls: ['./self-order.component.css']
 })

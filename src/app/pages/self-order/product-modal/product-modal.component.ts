@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { SizeLabelPipe } from '../../../pipes/size-label.pipe';
 
 @Component({
   selector: 'app-product-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SizeLabelPipe],
   templateUrl: './product-modal.component.html',
   styleUrls: ['./product-modal.component.css'],
 })
