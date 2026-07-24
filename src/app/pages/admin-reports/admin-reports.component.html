@@ -1,0 +1,119 @@
+<div class="reports-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Analytics</span>
+      <h1 class="page-title">Reports</h1>
+    </div>
+    <button class="refresh-btn" (click)="loadReport()" [disabled]="isLoading">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.spinning]="isLoading">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- DATE FILTER -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>From</label>
+      <input type="date" [(ngModel)]="startDate" class="date-input" />
+    </div>
+    <div class="filter-group">
+      <label>To</label>
+      <input type="date" [(ngModel)]="endDate" class="date-input" />
+    </div>
+    <button class="search-btn" (click)="loadReport()" [disabled]="isLoading">Search</button>
+  </div>
+
+  <div class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-label">Total Revenue</span>
+      <span class="kpi-value">₱{{ totalRevenue | number:'1.2-2' }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Total Orders</span>
+      <span class="kpi-value">{{ totalOrders }}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-label">Avg. Order Value</span>
+      <span class="kpi-value">₱{{ avgOrderValue | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <!-- TOP 5 PRODUCTS -->
+  <div class="top-products-card">
+    <span class="kpi-label">Top 5 Products</span>
+    <ol class="top-products-list" *ngIf="topFiveProducts.length > 0; else noTopProducts">
+      <li class="top-products-item" *ngFor="let p of topFiveProducts; let i = index">
+        <span class="rank">{{ i + 1 }}</span>
+        <span class="name">{{ p.name }}</span>
+      </li>
+    </ol>
+    <ng-template #noTopProducts>
+      <p class="top-products-empty">No product sales in this range.</p>
+    </ng-template>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chart-grid">
+
+    <div class="chart-card chart-card-wide">
+      <div class="chart-card-header">
+        <span class="chart-title">Revenue Trend</span>
+        <span class="chart-sub">{{ startDate | date:'MMM d' }} – {{ endDate | date:'MMM d, y' }}</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas #revenueCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-title">Orders by Status</span>
+      </div>
+      <div class="chart-canvas-wrap chart-canvas-wrap-square">
+        <canvas #statusCanvas></canvas>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item" *ngFor="let s of statusCounts">
+          <i [style.background]="s.color"></i>{{ s.label }} ({{ s.count }})
+        </span>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-title">Payment Methods</span>
+      </div>
+      <div class="chart-canvas-wrap chart-canvas-wrap-square">
+        <canvas #paymentCanvas></canvas>
+      </div>
+      <div class="chart-legend">
+        <span class="legend-item" *ngFor="let p of paymentCounts; let i = index">
+          <i [style.background]="paymentColors[i % paymentColors.length]"></i>{{ p.label }} ({{ p.count }})
+        </span>
+      </div>
+    </div>
+
+    <div class="chart-card chart-card-wide">
+      <div class="chart-card-header">
+        <span class="chart-title">Top Products</span>
+        <span class="chart-sub">by units sold</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas #productsCanvas></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="empty-note" *ngIf="!isLoading && !errorMessage && totalOrders === 0">
+    No orders found for this date range.
+  </div>
+
+</div>

@@ -37,6 +37,11 @@ export const routes: Routes = [
       { path: 'orders', component: OrdersComponent },
       { path: 'products', component: AdminProductsComponent },
       { path: 'inventory', component: AdminInventoryComponent },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/admin-reports/admin-reports.component').then(m => m.AdminReportsComponent)
+      },
       { path: 'settings', component: SettingsComponent }
     ]
   },
