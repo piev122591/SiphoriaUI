@@ -289,6 +289,10 @@ export class AdminProductsComponent implements OnInit {
 
   deleteProduct(p: any) {
     if (this.deletingProductId === p.id) return;
+    if (this.getVariants(p.id).length > 0) {
+      alert('This product still has variants — remove those first.');
+      return;
+    }
     if (!confirm(`Delete "${p.name}"? This will permanently remove the product. This cannot be undone.`)) return;
 
     this.deletingProductId = p.id;
