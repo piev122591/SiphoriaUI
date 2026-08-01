@@ -241,6 +241,34 @@ tfoot .table-footer {
   color: #b07d1a;
 }
 
+.btn-delete-product-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  margin-left: 8px;
+  background: rgba(224, 112, 96, 0.08);
+  border: 1.5px solid rgba(224, 112, 96, 0.35);
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c0392b;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-delete-product-row:hover:not(:disabled) {
+  background: rgba(224, 112, 96, 0.18);
+  border-color: #e07060;
+  color: #a5281a;
+}
+
+.btn-delete-product-row:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .chevron {
   display: inline-block;
   font-size: 0.75rem;
@@ -456,6 +484,24 @@ tfoot .table-footer {
 .btn-variant-recipe:hover {
   background: rgba(201, 169, 110, 0.22);
   border-color: #c9a96e;
+}
+
+.btn-variant-delete {
+  border: 1.5px solid rgba(224, 112, 96, 0.35);
+  border-radius: 8px;
+  background: rgba(224, 112, 96, 0.08);
+  color: #c0392b;
+}
+
+.btn-variant-delete:hover:not(:disabled) {
+  background: rgba(224, 112, 96, 0.18);
+  border-color: #e07060;
+  color: #a5281a;
+}
+
+.btn-variant-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .variant-empty {
@@ -1212,6 +1258,15 @@ select.form-input { cursor: pointer; }
 
   .category-cell { width: 100%; border-top: 1px solid #f5ede4; }
   .sizes-cell { width: 100%; border-top: 1px solid #f5ede4; }
+
+  .action-cell {
+    width: 100%;
+    justify-content: flex-end;
+    border-top: 1px solid #f5ede4;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
 
   tbody tr.detail-row {
     display: block;

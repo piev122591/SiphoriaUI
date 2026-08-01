@@ -47,6 +47,14 @@ export class ProductService {
     return this.http.put(`https://siphoriabackend-production.up.railway.app/productDetails/${id}`, data);
   }
 
+  deleteProduct(id: number): Observable<any> {
+    return this.http.delete(`https://siphoriabackend-production.up.railway.app/products/${id}`);
+  }
+
+  deleteProductDetail(id: number): Observable<any> {
+    return this.http.delete(`https://siphoriabackend-production.up.railway.app/productDetails/${id}`);
+  }
+
   getSizes(): Observable<any> {
     return this.http.get('https://siphoriabackend-production.up.railway.app/products/size');
   }

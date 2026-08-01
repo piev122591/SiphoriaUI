@@ -132,7 +132,7 @@ export class SelfOrderComponent implements OnInit {
   private printReceipt(orderResponse: any) {
     const paymentType = this.paymentTypes.find(p => p.id === this.paymentTypeId)?.label ?? 'Cash';
 
-    this.printerService.printReceipt({
+    this.printerService.printReceiptWithKitchenCopy({
       orderId: orderResponse?.id ?? orderResponse?.order_id ?? orderResponse?.orderId,
       customerName: this.customerName,
       paymentType,

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OrderService } from '../../services/order.service';
 import { LoadingService } from '../../services/loading.service';
+import { PrinterService } from '../../services/printer.service';
 
 @Component({
   selector: 'app-orders',
@@ -19,6 +20,7 @@ export class OrdersComponent implements OnInit {
   expandedOrderId: number | null = null;
   loadingDetailId: number | null = null;
   updatingStatusId: number | null = null;
+  printingOrderId: number | null = null;
 
   today = new Date().toISOString().split('T')[0];
   startDate = this.today;
@@ -42,7 +44,11 @@ export class OrdersComponent implements OnInit {
     { id: 3, label: 'Maya', logo: 'logos/maya.svg' }
   ];
 
-  constructor(private orderService: OrderService, private loadingService: LoadingService) {}
+  constructor(
+    private orderService: OrderService,
+    private loadingService: LoadingService,
+    private printerService: PrinterService
+  ) {}
 
   ngOnInit() {
     this.loadOrders();
@@ -138,6 +144,51 @@ export class OrdersComponent implements OnInit {
       error: () => {
         this.loadingDetailId = null;
       }
+    });
+  }
+
+  printOrder(order: any) {
+    if (this.printingOrderId === order.id) return;
+
+    if (order.order_details?.[0]?.product_name !== undefined) {
+      this.sendToPrinter(order);
+      return;
+    }
+
+    this.printingOrderId = order.id;
+    this.orderService.getOrderDetails(order.id).subscribe({
+      next: (details) => {
+        order.order_details = details;
+        this.sendToPrinter(order);
+      },
+      error: () => {
+        this.printingOrderId = null;
+        this.errorMessage = 'Failed to load order details for printing.';
+      }
+    });
+  }
+
+  private sendToPrinter(order: any) {
+    this.printingOrderId = order.id;
+    const paymentType = this.getPaymentType(order.payment_type_id)?.label ?? 'Cash';
+
+    this.printerService.printReceipt({
+      orderId: order.id,
+      customerName: order.name,
+      paymentType,
+      items: (order.order_details ?? []).map((d: any) => ({
+        name: d.product_name,
+        size: d.size_name,
+        qty: d.qty,
+        price: d.price
+      })),
+      total: parseFloat(this.toPrice(order.total)),
+      createdAt: order.order_date ? new Date(order.order_date) : undefined
+    }).catch((err: any) => {
+      const reason = err?.message ?? String(err);
+      this.errorMessage = `Order #${order.id}: receipt could not be printed. ${reason}`;
+    }).finally(() => {
+      this.printingOrderId = null;
     });
   }
 }

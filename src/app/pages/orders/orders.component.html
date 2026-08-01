@@ -67,6 +67,7 @@
           <th>Status</th>
           <th>Remarks</th>
           <th>Date</th>
+          <th>Print</th>
         </tr>
       </thead>
       <tbody>
@@ -109,11 +110,22 @@
             </td>
             <td class="remarks-cell" data-label="Remarks">{{ order.remarks || '—' }}</td>
             <td class="date-cell" data-label="Date">{{ order.order_date | date:'MMM d, y' }}</td>
+            <td class="print-cell" data-label="Print">
+              <button class="print-btn" (click)="printOrder(order)" [disabled]="printingOrderId === order.id" title="Print receipt">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span *ngIf="printingOrderId !== order.id">Print</span>
+                <span *ngIf="printingOrderId === order.id">Printing…</span>
+              </button>
+            </td>
           </tr>
 
           <!-- Detail row -->
           <tr class="detail-row" *ngIf="expandedOrderId === order.id">
-            <td colspan="8" class="detail-cell">
+            <td colspan="9" class="detail-cell">
               <div class="detail-panel">
                 <div class="detail-panel-header">
                   <span class="detail-panel-title">Order Items</span>
@@ -162,7 +174,7 @@
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="8" class="table-footer">
+          <td colspan="9" class="table-footer">
             Total Orders: {{ orders.length }}
           </td>
         </tr>

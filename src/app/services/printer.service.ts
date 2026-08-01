@@ -192,19 +192,21 @@ export class PrinterService {
     }
   }
 
+  private async resolvePrinterConfig(): Promise<any> {
+    const lib = this.qz();
+    const printerName = this.printerNameSubject.value ?? (this.PRINTER_NAME
+      ? await lib.printers.find(this.PRINTER_NAME)
+      : await lib.printers.getDefault());
+    return lib.configs.create(printerName);
+  }
+
   /** Builds the receipt and sends it straight to the thermal printer. */
   async printReceipt(receipt: ReceiptData): Promise<void> {
     const lib = this.qz();
     try {
       await this.connect();
-
-      const printerName = this.printerNameSubject.value ?? (this.PRINTER_NAME
-        ? await lib.printers.find(this.PRINTER_NAME)
-        : await lib.printers.getDefault());
-
-      const config = lib.configs.create(printerName);
+      const config = await this.resolvePrinterConfig();
       const data = [{ type: 'raw', format: 'plain', data: this.buildReceiptText(receipt) }];
-
       await lib.print(config, data);
     } catch (err) {
       console.error('Receipt print failed:', err);
@@ -212,7 +214,33 @@ export class PrinterService {
     }
   }
 
-  private buildReceiptText(r: ReceiptData): string {
+  async printReceiptWithKitchenCopy(receipt: ReceiptData): Promise<void> {
+    const lib = this.qz();
+    try {
+      await this.connect();
+      const config = await this.resolvePrinterConfig();
+      const customerText = this.buildReceiptText(receipt, { copyLabel: 'Customer Copy' });
+      const kitchenText = this.buildReceiptText(receipt, { copyLabel: 'Kitchen Copy', hidePrices: true });
+      const data = [{ type: 'raw', format: 'plain', data: customerText + this.cutDivider() + kitchenText }];
+      await lib.print(config, data);
+    } catch (err) {
+      console.error('Receipt print failed:', err);
+      throw err;
+    }
+  }
+
+  /** Plain-text separator between the two copies — a manual cut/tear guide for printers without an auto-cutter. */
+  private cutDivider(): string {
+    const ALIGN_CENTER = this.ESC + 'a' + '\x01';
+    const ALIGN_LEFT = this.ESC + 'a' + '\x00';
+    const BOLD_ON = this.ESC + 'E' + '\x01';
+    const BOLD_OFF = this.ESC + 'E' + '\x00';
+    return '\n' + ALIGN_CENTER + BOLD_ON + '- - - - CUT HERE - - - -' + BOLD_OFF + '\n\n' + ALIGN_LEFT;
+  }
+
+  private buildReceiptText(r: ReceiptData, opts: { copyLabel?: string; hidePrices?: boolean } = {}): string {
+    const copyLabel = opts.copyLabel ?? 'Official Receipt';
+    const hidePrices = opts.hidePrices ?? false;
     const ESC = this.ESC, GS = this.GS;
     const INIT = ESC + '@';
     const ALIGN_CENTER = ESC + 'a' + '\x01';
@@ -228,30 +256,39 @@ export class PrinterService {
 
     let out = INIT;
     out += ALIGN_CENTER + DOUBLE_ON + 'SIPHORIA' + DOUBLE_OFF + '\n';
-    out += 'Official Receipt\n';
+    out += copyLabel + '\n';
     out += this.divider();
 
     out += ALIGN_LEFT;
     out += this.twoCol('Order #:', r.orderId != null ? String(r.orderId) : '-');
     out += this.twoCol('Date:', dateStr);
     out += this.twoCol('Customer:', r.customerName || 'Guest');
-    out += this.twoCol('Payment:', r.paymentType);
+    if (!hidePrices) {
+      out += this.twoCol('Payment:', r.paymentType);
+    }
     out += this.divider();
 
     for (const item of r.items) {
       const label = item.size ? `${item.name} (${item.size}oz)` : item.name;
-      out += this.truncate(label) + '\n';
-      const price = this.toNum(item.price);
-      const qtyPrice = `  ${item.qty} x ${price.toFixed(2)}`;
-      const lineTotal = (item.qty * price).toFixed(2);
-      out += this.twoCol(qtyPrice, lineTotal);
+      if (hidePrices) {
+        out += this.truncate(`${item.qty}x  ${label}`) + '\n';
+      } else {
+        out += this.truncate(label) + '\n';
+        const price = this.toNum(item.price);
+        const qtyPrice = `  ${item.qty} x ${price.toFixed(2)}`;
+        const lineTotal = (item.qty * price).toFixed(2);
+        out += this.twoCol(qtyPrice, lineTotal);
+      }
     }
 
     out += this.divider();
-    out += BOLD_ON + this.twoCol('TOTAL', 'P' + this.toNum(r.total).toFixed(2)) + BOLD_OFF;
-    out += this.divider();
-
-    out += ALIGN_CENTER + 'Thank you! Please come again.\n';
+    if (!hidePrices) {
+      out += BOLD_ON + this.twoCol('TOTAL', 'P' + this.toNum(r.total).toFixed(2)) + BOLD_OFF;
+      out += this.divider();
+      out += ALIGN_CENTER + 'Thank you! Please come again.\n';
+    } else {
+      out += ALIGN_CENTER + BOLD_ON + 'Prepare items above' + BOLD_OFF + '\n';
+    }
     out += CUT;
 
     return out;

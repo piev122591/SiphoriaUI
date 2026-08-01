@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { LoadingService } from '../../services/loading.service';
@@ -24,6 +25,8 @@ export class AdminProductsComponent implements OnInit {
   editingVariantId: number | null = null;
   editingPrice: number | null = null;
   updatingVariantId: number | null = null;
+  deletingProductId: number | null = null;
+  deletingVariantId: number | null = null;
 
   showAddModal = false;
   submitting = false;
@@ -280,6 +283,56 @@ export class AdminProductsComponent implements OnInit {
       },
       error: () => {
         this.updatingVariantId = null;
+      }
+    });
+  }
+
+  deleteProduct(p: any) {
+    if (this.deletingProductId === p.id) return;
+    if (!confirm(`Delete "${p.name}"? This will permanently remove the product. This cannot be undone.`)) return;
+
+    this.deletingProductId = p.id;
+    this.productService.deleteProduct(p.id).subscribe({
+      next: () => {
+        this.products = this.products.filter(x => x.id !== p.id);
+        this.productDetails = this.productDetails.filter(d => d.productId !== p.id);
+        if (this.expandedProductId === p.id) this.expandedProductId = null;
+        this.deletingProductId = null;
+      },
+      error: (err: HttpErrorResponse) => {
+        this.deletingProductId = null;
+        if (err.status === 404) {
+          this.products = this.products.filter(x => x.id !== p.id);
+          alert('This product was already removed.');
+        } else if (err.status === 409) {
+          alert('Cannot delete this product — it still has variants or existing orders linked to it. Remove those first.');
+        } else {
+          alert('Failed to delete product. Please try again.');
+        }
+      }
+    });
+  }
+
+  deleteVariant(v: any) {
+    if (this.deletingVariantId === v.id) return;
+    if (!confirm('Delete this variant? This will permanently remove this size/price option. This cannot be undone.')) return;
+
+    this.deletingVariantId = v.id;
+    this.productService.deleteProductDetail(v.id).subscribe({
+      next: () => {
+        this.productDetails = this.productDetails.filter(d => d.id !== v.id);
+        this.deletingVariantId = null;
+      },
+      error: (err: HttpErrorResponse) => {
+        this.deletingVariantId = null;
+        if (err.status === 404) {
+          this.productDetails = this.productDetails.filter(d => d.id !== v.id);
+          alert('This variant was already removed.');
+        } else if (err.status === 409) {
+          alert('Cannot delete this variant — it still has recipe ingredients or existing orders linked to it. Remove those first.');
+        } else {
+          alert('Failed to delete variant. Please try again.');
+        }
       }
     });
   }
