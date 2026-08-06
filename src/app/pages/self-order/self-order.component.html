@@ -62,6 +62,16 @@
         <span>Total</span>
         <span>₱{{ getCartTotal() }}</span>
       </div>
+      <div class="remarks-group" *ngIf="cart.length > 0">
+        <label class="remarks-label" for="remarks-mobile">Remarks</label>
+        <textarea
+          id="remarks-mobile"
+          class="remarks-input"
+          [(ngModel)]="remarks"
+          placeholder="Add a note for this order (optional)"
+          rows="2">
+        </textarea>
+      </div>
       <div class="payment-type-group" *ngIf="cart.length > 0">
         <label class="payment-label">Payment</label>
         <div class="payment-options">
@@ -155,6 +165,16 @@
       <div class="order-total" *ngIf="cart.length > 0">
         <span>Total</span>
         <span class="total-amount">₱{{ getCartTotal() }}</span>
+      </div>
+      <div class="remarks-group" *ngIf="cart.length > 0">
+        <label class="remarks-label" for="remarks-desktop">Remarks</label>
+        <textarea
+          id="remarks-desktop"
+          class="remarks-input"
+          [(ngModel)]="remarks"
+          placeholder="Add a note for this order (optional)"
+          rows="2">
+        </textarea>
       </div>
       <div class="payment-type-group" *ngIf="cart.length > 0">
         <label class="payment-label">Payment</label>

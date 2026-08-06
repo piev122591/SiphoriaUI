@@ -57,7 +57,7 @@ export class AdminReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   errorMessage: string | null = null;
 
   endDate = new Date().toISOString().split('T')[0];
-  startDate = this.daysAgo(29);
+  startDate = this.endDate;
 
   totalRevenue = 0;
   totalOrders = 0;
@@ -114,12 +114,6 @@ export class AdminReportsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadingService.stop();
       }
     });
-  }
-
-  private daysAgo(n: number): string {
-    const d = new Date();
-    d.setDate(d.getDate() - n);
-    return d.toISOString().split('T')[0];
   }
 
   private parsePrice(value: any): number {

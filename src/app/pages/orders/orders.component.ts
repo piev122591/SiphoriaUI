@@ -61,7 +61,9 @@ export class OrdersComponent implements OnInit {
 
     this.orderService.getOrdersByDate(this.startDate, this.endDate).subscribe({
       next: (data) => {
-        this.orders = data.map(o => ({ ...o, status_id: +o.status_id, payment_type_id: +o.payment_type_id }));
+        this.orders = data
+          .map(o => ({ ...o, status_id: +o.status_id, payment_type_id: +o.payment_type_id }))
+          .sort((a, b) => b.id - a.id);
         this.isLoading = false;
         this.loadingService.stop();
       },

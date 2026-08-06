@@ -275,6 +275,36 @@
   margin-bottom: 20px;
 }
 
+.remarks-group {
+  margin: 14px 0 4px;
+}
+
+.remarks-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.remarks-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.remarks-input:focus {
+  outline: none;
+  border-color: #c9a96e;
+}
+
 .payment-type-group {
   margin: 14px 0 4px;
 }

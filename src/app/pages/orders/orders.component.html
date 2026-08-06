@@ -103,8 +103,7 @@
             <td class="status-cell" data-label="Status">
               <select class="status-select" [ngClass]="getStatusClass(order.status_id)"
                 [ngModel]="order.status_id"
-                (ngModelChange)="updateStatus(order, $event)"
-                [disabled]="order.status_id === 2 || order.status_id === 3">
+                (ngModelChange)="updateStatus(order, $event)">
                 <option *ngFor="let s of statuses" [ngValue]="s.status_id">{{ s.name }}</option>
               </select>
             </td>

@@ -120,6 +120,7 @@ export class SelfOrderComponent implements OnInit {
         this.isPlacingOrder = false;
         this.printReceipt(response);
         this.cart = [];
+        this.remarks = '';
         this.step = 1;
       },
       error: (_) => {
