@@ -12,6 +12,7 @@ import { LoadingService } from '../../services/loading.service';
 })
 export class AdminLayoutComponent {
   isLoading$;
+  isDevUser = localStorage.getItem('username') === 'piev122591';
 
   constructor(private router: Router, private loadingService: LoadingService) {
     this.isLoading$ = this.loadingService.isLoading$;
@@ -19,6 +20,7 @@ export class AdminLayoutComponent {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     this.router.navigate(['/login']);
   }
 }

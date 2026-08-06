@@ -69,13 +69,13 @@ export class AdminProductsComponent implements OnInit {
   }
 
   addingVariantProductId: number | null = null;
-  newVariant: { sizeid: number | null; price: number | null; imageFolder: string | null; imageFile: string | null } =
-    { sizeid: null, price: null, imageFolder: null, imageFile: null };
+  newVariant: { sizeid: number | null; price: number | null; fc: number | null; imageFolder: string | null; imageFile: string | null } =
+    { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
   savingVariant = false;
 
   editingVariant: any = null;
-  editVariantForm: { sizeid: number | null; price: number | null; imageFolder: string | null; imageFile: string | null } =
-    { sizeid: null, price: null, imageFolder: null, imageFile: null };
+  editVariantForm: { sizeid: number | null; price: number | null; fc: number | null; imageFolder: string | null; imageFile: string | null } =
+    { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
   savingEditVariant = false;
 
   // RECIPE (inventory usage per size-SKU)
@@ -359,12 +359,12 @@ export class AdminProductsComponent implements OnInit {
 
   openAddVariant(productId: number) {
     this.addingVariantProductId = productId;
-    this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+    this.newVariant = { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
   }
 
   cancelAddVariant() {
     this.addingVariantProductId = null;
-    this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+    this.newVariant = { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
   }
 
   onNewVariantFolderChange(folder: string | null) {
@@ -380,13 +380,14 @@ export class AdminProductsComponent implements OnInit {
       productid: productId,
       sizeid: this.newVariant.sizeid!,
       price: this.newVariant.price!,
+      fc: this.newVariant.fc,
       image_url: this.composeImagePath(this.newVariant.imageFolder, this.newVariant.imageFile)
     }).subscribe({
       next: () => {
         this.loadProductDetails();
         this.savingVariant = false;
         this.addingVariantProductId = null;
-        this.newVariant = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+        this.newVariant = { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
       },
       error: () => { this.savingVariant = false; }
     });
@@ -403,6 +404,7 @@ export class AdminProductsComponent implements OnInit {
     this.editVariantForm = {
       sizeid: matchedSize ? matchedSize.id : null,
       price: parseFloat(v.price),
+      fc: v.fc !== null && v.fc !== undefined ? parseFloat(v.fc) : null,
       imageFolder: folder,
       imageFile: file
     };
@@ -410,7 +412,7 @@ export class AdminProductsComponent implements OnInit {
 
   cancelEditVariant() {
     this.editingVariant = null;
-    this.editVariantForm = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+    this.editVariantForm = { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
   }
 
   onEditVariantFolderChange(folder: string | null) {
@@ -426,13 +428,14 @@ export class AdminProductsComponent implements OnInit {
       productid: this.editingVariant.productId,
       sizeid: this.editVariantForm.sizeid!,
       price: this.editVariantForm.price!,
+      fc: this.editVariantForm.fc,
       image_url: this.composeImagePath(this.editVariantForm.imageFolder, this.editVariantForm.imageFile)
     }).subscribe({
       next: () => {
         this.loadProductDetails();
         this.savingEditVariant = false;
         this.editingVariant = null;
-        this.editVariantForm = { sizeid: null, price: null, imageFolder: null, imageFile: null };
+        this.editVariantForm = { sizeid: null, price: null, fc: null, imageFolder: null, imageFile: null };
       },
       error: () => { this.savingEditVariant = false; }
     });

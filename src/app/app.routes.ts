@@ -42,6 +42,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/admin-reports/admin-reports.component').then(m => m.AdminReportsComponent)
       },
+      {
+        path: 'devtool',
+        loadComponent: () =>
+          import('./pages/admin-devtool/admin-devtool.component').then(m => m.AdminDevtoolComponent)
+      },
       { path: 'settings', component: SettingsComponent }
     ]
   },

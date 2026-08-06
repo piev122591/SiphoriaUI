@@ -39,11 +39,11 @@ export class ProductService {
     return this.http.post('https://siphoriabackend-production.up.railway.app/products', data);
   }
 
-  createProductDetail(data: { productid: number; sizeid: number; price: number; image_url?: string }): Observable<any> {
+  createProductDetail(data: { productid: number; sizeid: number; price: number; fc?: number | null; image_url?: string }): Observable<any> {
     return this.http.post('https://siphoriabackend-production.up.railway.app/productDetails', data);
   }
 
-  updateProductDetail(id: number, data: { productid: number; sizeid: number; price: number; image_url?: string }): Observable<any> {
+  updateProductDetail(id: number, data: { productid: number; sizeid: number; price: number; fc?: number | null; image_url?: string }): Observable<any> {
     return this.http.put(`https://siphoriabackend-production.up.railway.app/productDetails/${id}`, data);
   }
 

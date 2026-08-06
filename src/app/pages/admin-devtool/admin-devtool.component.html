@@ -1,0 +1,108 @@
+<div class="devtool-page">
+
+  <div class="page-header">
+    <div>
+      <span class="page-tag">Developer</span>
+      <h1 class="page-title">DevTool</h1>
+    </div>
+  </div>
+
+  <div class="devtool-warning">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span>Runs raw SQL directly against the live database. There is no auth and no undo — double-check before running anything, especially destructive statements.</span>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-panel">
+    <textarea
+      class="sql-editor"
+      [(ngModel)]="sql"
+      placeholder="SELECT * FROM orders ORDER BY order_date DESC LIMIT 50;"
+      spellcheck="false"
+      rows="9"
+    ></textarea>
+
+    <div class="editor-actions">
+      <span class="destructive-badge" *ngIf="isDestructive">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Destructive statement — will ask for confirmation
+      </span>
+      <span class="destructive-badge-spacer" *ngIf="!isDestructive"></span>
+
+      <div class="editor-buttons">
+        <button class="btn-clear" (click)="clear()" [disabled]="running">Clear</button>
+        <button
+          class="btn-run"
+          [class.btn-run-destructive]="isDestructive"
+          (click)="onRunClick()"
+          [disabled]="running || !sql.trim()">
+          {{ running ? 'Running…' : 'Run Query' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state-box error-state" *ngIf="errorMessage">
+    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#d9534f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="result-panel" *ngIf="result">
+    <div class="result-meta">
+      <span class="result-command">{{ result.command }}</span>
+      <span class="result-count">{{ result.rowCount }} row{{ result.rowCount !== 1 ? 's' : '' }}</span>
+    </div>
+
+    <div class="table-wrap" *ngIf="columns.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let c of columns">{{ c }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of result.rows">
+            <td *ngFor="let c of columns">{{ formatCell(row[c]) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="result-empty" *ngIf="columns.length === 0">No rows returned.</p>
+  </div>
+
+</div>
+
+<!-- CONFIRM DESTRUCTIVE MODAL -->
+<div class="modal-overlay" *ngIf="pendingConfirmSql !== null" (click)="cancelConfirm()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Confirm Destructive Query</h2>
+      <button class="modal-close" (click)="cancelConfirm()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="confirm-warning">
+        This statement can permanently modify or delete data and cannot be undone. Review it carefully — it will run against the live database exactly as written below.
+      </p>
+      <pre class="confirm-sql">{{ pendingConfirmSql }}</pre>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cancelConfirm()">Cancel</button>
+      <button class="btn-modal-danger" (click)="confirmDestructive()">Yes, run it</button>
+    </div>
+
+  </div>
+</div>

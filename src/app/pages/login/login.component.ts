@@ -53,6 +53,7 @@ export class LoginComponent {
     .subscribe({
       next: (response: any) => {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('username', credentials.username);
         this.isLoading = false;
         this.router.navigate(['/admin/orders']);
       },
