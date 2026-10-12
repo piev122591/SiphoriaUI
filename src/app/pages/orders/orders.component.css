@@ -37,7 +37,13 @@
   margin: 0;
 }
 
-.refresh-btn {
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.refresh-btn,
+.export-btn {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -53,12 +59,14 @@
   transition: border-color 0.18s ease, background 0.18s ease;
 }
 
-.refresh-btn:hover:not(:disabled) {
+.refresh-btn:hover:not(:disabled),
+.export-btn:hover:not(:disabled) {
   border-color: #c9a96e;
   background: #fdfaf7;
 }
 
-.refresh-btn:disabled {
+.refresh-btn:disabled,
+.export-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -259,6 +267,12 @@ tbody td {
 .total-cell {
   font-weight: 600;
   color: #2c1810;
+}
+
+.discount-cell {
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: #7a5a2f;
 }
 
 .payment-cell {
@@ -560,6 +574,16 @@ tbody td {
 
   .page-title {
     font-size: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .header-actions .refresh-btn,
+  .header-actions .export-btn {
+    flex: 1;
+    justify-content: center;
   }
 
   .filter-bar {

@@ -1,0 +1,20 @@
+.product-search {
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.rank-cell {
+  color: #b0a090;
+  width: 40px;
+}
+
+.sizes-cell {
+  color: #8a7565;
+  font-size: 0.8rem;
+}
+
+.qty-cell {
+  font-weight: 600;
+}

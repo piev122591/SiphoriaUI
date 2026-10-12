@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { OrderService } from '../../services/order.service';
+import { DiscountService } from '../../services/discount.service';
 import { LoadingService } from '../../services/loading.service';
 import { PrinterService } from '../../services/printer.service';
 
@@ -15,12 +17,14 @@ import { PrinterService } from '../../services/printer.service';
 export class OrdersComponent implements OnInit {
 
   orders: any[] = [];
+  discounts: any[] = [];
   isLoading = false;
   errorMessage: string | null = null;
   expandedOrderId: number | null = null;
   loadingDetailId: number | null = null;
   updatingStatusId: number | null = null;
   printingOrderId: number | null = null;
+  isExporting = false;
 
   today = new Date().toISOString().split('T')[0];
   startDate = this.today;
@@ -46,12 +50,32 @@ export class OrdersComponent implements OnInit {
 
   constructor(
     private orderService: OrderService,
+    private discountService: DiscountService,
     private loadingService: LoadingService,
     private printerService: PrinterService
   ) {}
 
   ngOnInit() {
     this.loadOrders();
+    this.loadDiscounts();
+  }
+
+  loadDiscounts() {
+    this.discountService.getDiscounts().subscribe({
+      next: res => { this.discounts = res; },
+      error: () => {}
+    });
+  }
+
+  getDiscountName(discountId: number | null | undefined): string | null {
+    if (discountId == null) return null;
+    return this.discounts.find(d => d.id === discountId)?.name ?? `#${discountId}`;
+  }
+
+  getDiscountLabel(order: any): string {
+    const name = this.getDiscountName(order.discount_id);
+    if (!name) return '—';
+    return order.discount != null ? `${name} (${this.toPrice(order.discount)}%)` : name;
   }
 
   loadOrders() {
@@ -168,6 +192,70 @@ export class OrdersComponent implements OnInit {
         this.errorMessage = 'Failed to load order details for printing.';
       }
     });
+  }
+
+  exportOrders() {
+    if (!this.orders.length || this.isExporting) return;
+
+    const missing = this.orders.filter(o => o.order_details?.[0]?.product_name === undefined);
+    if (!missing.length) {
+      this.buildAndDownloadCsv();
+      return;
+    }
+
+    this.isExporting = true;
+    forkJoin(missing.map(o => this.orderService.getOrderDetails(o.id))).subscribe({
+      next: (results) => {
+        results.forEach((details, i) => missing[i].order_details = details);
+        this.isExporting = false;
+        this.buildAndDownloadCsv();
+      },
+      error: () => {
+        this.isExporting = false;
+        this.errorMessage = 'Failed to load order details for export.';
+      }
+    });
+  }
+
+  private buildAndDownloadCsv() {
+    const headers = ['Order #', 'Customer', 'Items', 'Total', 'Discount', 'Payment', 'Status', 'Remarks', 'Date'];
+    const rows = this.orders.map(o => [
+      o.id,
+      o.name ?? '',
+      this.formatItemsForExport(o.order_details),
+      this.toPrice(o.total),
+      this.getDiscountLabel(o),
+      this.getPaymentType(o.payment_type_id)?.label ?? '',
+      this.getStatusLabel(o.status_id),
+      o.remarks ?? '',
+      o.order_date ? new Date(o.order_date).toLocaleDateString() : ''
+    ]);
+
+    const csv = [headers, ...rows]
+      .map(row => row.map(field => this.csvEscape(field)).join(','))
+      .join('\r\n');
+
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `orders_${this.startDate}_to_${this.endDate}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  private formatItemsForExport(details: any[] | undefined): string {
+    if (!details?.length) return '';
+    return details
+      .map(d => `${d.product_name}${d.size_name ? ' (' + d.size_name + ')' : ''} x${d.qty} @₱${this.toPrice(d.price)} = ₱${this.getSubtotal(d.price, d.qty)}`)
+      .join('; ');
+  }
+
+  private csvEscape(value: any): string {
+    const str = String(value ?? '');
+    return /[",\n\r]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
   }
 
   private sendToPrinter(order: any) {

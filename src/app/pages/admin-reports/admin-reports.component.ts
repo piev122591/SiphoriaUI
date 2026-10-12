@@ -6,6 +6,8 @@ import { from, of } from 'rxjs';
 import { catchError, mergeMap, toArray } from 'rxjs/operators';
 import { OrderService } from '../../services/order.service';
 import { LoadingService } from '../../services/loading.service';
+import { AdminExportComponent } from '../admin-export/admin-export.component';
+import { AdminProductsSoldComponent } from '../admin-products-sold/admin-products-sold.component';
 
 Chart.register(...registerables);
 
@@ -36,7 +38,7 @@ interface RevenuePoint {
 @Component({
   selector: 'app-admin-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminExportComponent, AdminProductsSoldComponent],
   templateUrl: './admin-reports.component.html',
   styleUrls: ['./admin-reports.component.css']
 })
@@ -51,6 +53,8 @@ export class AdminReportsComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly statusMap: Record<number, string> = { 1: 'Pending', 2: 'Completed', 3: 'Cancelled' };
   private readonly statusColors: Record<number, string> = { 1: '#e8b339', 2: '#2e7d4f', 3: '#c0392b' };
   private readonly paymentMap: Record<number, string> = { 1: 'Cash', 2: 'GCash', 3: 'Maya' };
+
+  activeTab: 'analytics' | 'detailed' | 'products' = 'analytics';
 
   orders: any[] = [];
   isLoading = false;

@@ -65,6 +65,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add Variant
               </button>
+              <button class="btn-variant-action btn-variant-edit" (click)="openEditProduct(p)" title="Edit product name/category">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit
+              </button>
               <button class="btn-delete-product-row" (click)="deleteProduct(p)" [disabled]="deletingProductId === p.id || getVariants(p.id).length > 0" [title]="getVariants(p.id).length > 0 ? 'Remove all variants before deleting this product' : 'Delete product'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 {{ deletingProductId === p.id ? 'Deleting…' : 'Delete' }}
@@ -322,12 +326,64 @@
         </select>
       </div>
 
+      <div class="form-group">
+        <label class="form-label">Station</label>
+        <select class="form-input" [(ngModel)]="newProduct.station">
+          <option [ngValue]="null">Use category default</option>
+          <option ngValue="drinks">Drinks</option>
+          <option ngValue="kitchen">Kitchen</option>
+        </select>
+      </div>
+
     </div>
 
     <div class="modal-footer">
       <button class="btn-modal-cancel" (click)="closeAddModal()">Cancel</button>
       <button class="btn-modal-save" [disabled]="!canSubmit || submitting" (click)="submitNewProduct()">
         {{ submitting ? 'Saving…' : 'Save Product' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal-overlay" *ngIf="editingProduct !== null" (click)="cancelEditProduct()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Product</h2>
+      <button class="modal-close" (click)="cancelEditProduct()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" type="text" placeholder="e.g. Classic Latte" [(ngModel)]="editProductForm.name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input" [(ngModel)]="editProductForm.categoryid">
+          <option [ngValue]="null" disabled>Select a category</option>
+          <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Station</label>
+        <select class="form-input" [(ngModel)]="editProductForm.station">
+          <option [ngValue]="null">Use category default</option>
+          <option ngValue="drinks">Drinks</option>
+          <option ngValue="kitchen">Kitchen</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" (click)="cancelEditProduct()">Cancel</button>
+      <button class="btn-modal-save" [disabled]="!canSubmitEditProduct || savingEditProduct" (click)="saveEditProduct()">
+        {{ savingEditProduct ? 'Saving…' : 'Save Changes' }}
       </button>
     </div>
 

@@ -2,10 +2,10 @@
 
   <div class="page-header">
     <div>
-      <span class="page-tag">Analytics</span>
+      <span class="page-tag">{{ activeTab === 'analytics' ? 'Analytics' : activeTab === 'detailed' ? 'Detailed Report' : 'Products Sold' }}</span>
       <h1 class="page-title">Reports</h1>
     </div>
-    <button class="refresh-btn" (click)="loadReport()" [disabled]="isLoading">
+    <button class="refresh-btn" *ngIf="activeTab === 'analytics'" (click)="loadReport()" [disabled]="isLoading">
       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.spinning]="isLoading">
         <polyline points="23 4 23 10 17 10"/>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
@@ -13,6 +13,25 @@
       Refresh
     </button>
   </div>
+
+  <!-- TABS -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn" role="tab" [class.active]="activeTab === 'analytics'"
+            [attr.aria-selected]="activeTab === 'analytics'" (click)="activeTab = 'analytics'">Analytics</button>
+    <button class="tab-btn" role="tab" [class.active]="activeTab === 'detailed'"
+            [attr.aria-selected]="activeTab === 'detailed'" (click)="activeTab = 'detailed'">Detailed Report</button>
+    <button class="tab-btn" role="tab" [class.active]="activeTab === 'products'"
+            [attr.aria-selected]="activeTab === 'products'" (click)="activeTab = 'products'">Products Sold</button>
+  </div>
+
+  <!-- DETAILED REPORT TAB -->
+  <app-admin-export *ngIf="activeTab === 'detailed'" [embedded]="true"></app-admin-export>
+
+  <!-- PRODUCTS SOLD TAB -->
+  <app-admin-products-sold *ngIf="activeTab === 'products'"></app-admin-products-sold>
+
+  <!-- ANALYTICS TAB (hidden, not destroyed, so chart canvases stay alive) -->
+  <div [hidden]="activeTab !== 'analytics'">
 
   <!-- DATE FILTER -->
   <div class="filter-bar">
@@ -114,6 +133,8 @@
 
   <div class="empty-note" *ngIf="!isLoading && !errorMessage && totalOrders === 0">
     No orders found for this date range.
+  </div>
+
   </div>
 
 </div>

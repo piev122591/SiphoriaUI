@@ -16,6 +16,8 @@ export class OrderService {
     payment_type_id: number;
     status_id: number;
     remarks: string;
+    discount_id?: number | null;
+    discount?: number | null;
     order_details: { product_details_id: number; qty: number; price: number; fc?: number | null }[];
   }): Observable<any> {
     return this.http.post(this.apiUrl, payload);

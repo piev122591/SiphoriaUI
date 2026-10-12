@@ -17,6 +17,10 @@ export interface ReceiptData {
   paymentType: string;
   items: ReceiptItem[];
   total: number;
+  subtotal?: number;
+  vatAmount?: number;
+  discountLabel?: string;
+  discountAmount?: number;
   createdAt?: Date;
 }
 
@@ -283,6 +287,16 @@ export class PrinterService {
 
     out += this.divider();
     if (!hidePrices) {
+      if (r.subtotal != null) {
+        out += this.twoCol('Subtotal', this.toNum(r.subtotal).toFixed(2));
+      }
+      if (r.vatAmount) {
+        out += this.twoCol('Less VAT (12%)', '-' + this.toNum(r.vatAmount).toFixed(2));
+      }
+      if (r.discountAmount) {
+        const label = r.discountLabel ? `Discount (${r.discountLabel})` : 'Discount';
+        out += this.twoCol(label, '-' + this.toNum(r.discountAmount).toFixed(2));
+      }
       out += BOLD_ON + this.twoCol('TOTAL', 'P' + this.toNum(r.total).toFixed(2)) + BOLD_OFF;
       out += this.divider();
       out += ALIGN_CENTER + 'Thank you! Please come again.\n';

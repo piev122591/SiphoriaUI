@@ -58,9 +58,44 @@
         </div>
         <div class="item-total">₱{{ item.price * item.qty }}</div>
       </div>
+      <div class="discount-group" *ngIf="cart.length > 0">
+        <div class="discount-label-row">
+          <input type="checkbox" [(ngModel)]="discountEnabled" (ngModelChange)="toggleDiscountEnabled()" />
+          <span class="discount-label">Discount</span>
+        </div>
+        <ng-container *ngIf="discountEnabled">
+          <div class="discount-controls">
+            <select class="discount-select" [(ngModel)]="selectedDiscountId" (ngModelChange)="onDiscountChange()">
+              <option *ngFor="let d of discounts" [ngValue]="d.id">{{ d.name }}</option>
+            </select>
+            <input
+              *ngIf="selectedDiscountId"
+              type="number"
+              class="discount-percent-input"
+              [(ngModel)]="discountPercent"
+              [readonly]="isVatExemptDiscount"
+              min="0"
+              max="100"
+              placeholder="%" />
+          </div>
+          <div class="discount-hint" *ngIf="isVatExemptDiscount">VAT-exempt: 12% VAT is deducted first, then 20% discount applies.</div>
+        </ng-container>
+      </div>
+      <div class="order-subtotal" *ngIf="cart.length > 0">
+        <span>Subtotal</span>
+        <span>₱{{ getCartTotal() | number:'1.2-2' }}</span>
+      </div>
+      <div class="order-vat" *ngIf="cart.length > 0 && isVatExemptDiscount">
+        <span>Less VAT (12%)</span>
+        <span>-₱{{ getVatAmount() | number:'1.2-2' }}</span>
+      </div>
+      <div class="order-discount" *ngIf="cart.length > 0 && getDiscountAmount() > 0">
+        <span>Discount</span>
+        <span>-₱{{ getDiscountAmount() | number:'1.2-2' }}</span>
+      </div>
       <div class="order-total" *ngIf="cart.length > 0">
         <span>Total</span>
-        <span>₱{{ getCartTotal() }}</span>
+        <span>₱{{ getFinalTotal() | number:'1.2-2' }}</span>
       </div>
       <div class="remarks-group" *ngIf="cart.length > 0">
         <label class="remarks-label" for="remarks-mobile">Remarks</label>
@@ -92,7 +127,7 @@
           </button>
         </div>
       </div>
-      <button class="place-order-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder">
+      <button class="place-order-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder || isDiscountInvalid">
         <span *ngIf="isPlacingOrder" class="btn-spinner"></span>
         <span *ngIf="!isPlacingOrder">Place Order</span>
       </button>
@@ -162,9 +197,44 @@
     </div>
 
     <div class="pos-footer">
+      <div class="discount-group" *ngIf="cart.length > 0">
+        <div class="discount-label-row">
+          <input type="checkbox" [(ngModel)]="discountEnabled" (ngModelChange)="toggleDiscountEnabled()" />
+          <span class="discount-label">Discount</span>
+        </div>
+        <ng-container *ngIf="discountEnabled">
+          <div class="discount-controls">
+            <select class="discount-select" [(ngModel)]="selectedDiscountId" (ngModelChange)="onDiscountChange()">
+              <option *ngFor="let d of discounts" [ngValue]="d.id">{{ d.name }}</option>
+            </select>
+            <input
+              *ngIf="selectedDiscountId"
+              type="number"
+              class="discount-percent-input"
+              [(ngModel)]="discountPercent"
+              [readonly]="isVatExemptDiscount"
+              min="0"
+              max="100"
+              placeholder="%" />
+          </div>
+          <div class="discount-hint" *ngIf="isVatExemptDiscount">VAT-exempt: 12% VAT is deducted first, then 20% discount applies.</div>
+        </ng-container>
+      </div>
+      <div class="order-subtotal" *ngIf="cart.length > 0">
+        <span>Subtotal</span>
+        <span>₱{{ getCartTotal() | number:'1.2-2' }}</span>
+      </div>
+      <div class="order-vat" *ngIf="cart.length > 0 && isVatExemptDiscount">
+        <span>Less VAT (12%)</span>
+        <span>-₱{{ getVatAmount() | number:'1.2-2' }}</span>
+      </div>
+      <div class="order-discount" *ngIf="cart.length > 0 && getDiscountAmount() > 0">
+        <span>Discount</span>
+        <span>-₱{{ getDiscountAmount() | number:'1.2-2' }}</span>
+      </div>
       <div class="order-total" *ngIf="cart.length > 0">
         <span>Total</span>
-        <span class="total-amount">₱{{ getCartTotal() }}</span>
+        <span class="total-amount">₱{{ getFinalTotal() | number:'1.2-2' }}</span>
       </div>
       <div class="remarks-group" *ngIf="cart.length > 0">
         <label class="remarks-label" for="remarks-desktop">Remarks</label>
@@ -196,7 +266,7 @@
           </button>
         </div>
       </div>
-      <button class="pos-place-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder">
+      <button class="pos-place-btn" (click)="placeOrder()" *ngIf="cart.length > 0" [disabled]="isPlacingOrder || isDiscountInvalid">
         <span *ngIf="isPlacingOrder" class="btn-spinner"></span>
         <span *ngIf="!isPlacingOrder">Place Order</span>
       </button>

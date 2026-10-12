@@ -1,0 +1,135 @@
+<div class="export-page" [class.standalone]="!embedded">
+
+  <div class="page-header" *ngIf="!embedded">
+    <div>
+      <span class="page-tag">Reports</span>
+      <h1 class="page-title">Export</h1>
+    </div>
+  </div>
+
+  <!-- TOOLBAR: date filter + actions -->
+  <div class="toolbar">
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>From</label>
+        <input type="date" [(ngModel)]="startDate" class="date-input" />
+      </div>
+      <div class="filter-group">
+        <label>To</label>
+        <input type="date" [(ngModel)]="endDate" class="date-input" />
+      </div>
+      <button class="search-btn" (click)="loadReport()" [disabled]="isLoading">Search</button>
+    </div>
+
+    <div class="header-actions">
+      <button class="export-btn" (click)="exportCsv()" [disabled]="isLoading || !hasRows">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Export CSV
+      </button>
+      <button class="refresh-btn" (click)="loadReport()" [disabled]="isLoading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.spinning]="isLoading">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="state-box" *ngIf="isLoading">
+    <div class="pulse-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="state-box state-box-error" *ngIf="!isLoading && errorMessage">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- STATION SECTIONS -->
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <section class="station-section" *ngFor="let s of sections">
+      <h2 class="section-title" *ngIf="s.label">{{ s.label }}</h2>
+
+      <div class="state-box state-box-sm" *ngIf="s.rows.length === 0">
+        <p>No sales recorded for this date range.</p>
+      </div>
+
+      <div class="table-wrap" *ngIf="s.rows.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total Serving</th>
+              <th>Gross Sales</th>
+              <th>Food Cost</th>
+              <th>12% VAT</th>
+              <th>Discount</th>
+              <th>Gross Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of s.rows">
+              <td data-label="Date">{{ formatDate(r.report_date) }}</td>
+              <td data-label="Total Serving">{{ r.total_serving }}</td>
+              <td data-label="Gross Sales">₱{{ formatPeso(r.gross_sales) }}</td>
+              <td data-label="Food Cost">₱{{ formatPeso(r.food_cost) }}</td>
+              <td data-label="12% VAT">₱{{ formatPeso(r.vat) }}</td>
+              <td data-label="Discount">₱{{ formatPeso(r.discount) }}</td>
+              <td data-label="Gross Profit">₱{{ formatPeso(r.gross_profit) }}</td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="totalsOf(s.rows) as t">
+            <tr class="totals-row">
+              <td>Total</td>
+              <td>{{ t.total_serving }}</td>
+              <td>₱{{ formatPeso(t.gross_sales) }}</td>
+              <td>₱{{ formatPeso(t.food_cost) }}</td>
+              <td>₱{{ formatPeso(t.vat) }}</td>
+              <td>₱{{ formatPeso(t.discount) }}</td>
+              <td>₱{{ formatPeso(t.gross_profit) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- GRAND TOTAL: Drinks + Kitchen -->
+    <section class="station-section" *ngIf="embedded && hasRows">
+      <h2 class="section-title">Total — Drinks + Kitchen</h2>
+      <div class="table-wrap" *ngIf="grandTotals as t">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Total Serving</th>
+              <th>Gross Sales</th>
+              <th>Food Cost</th>
+              <th>12% VAT</th>
+              <th>Discount</th>
+              <th>Gross Profit</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr class="totals-row">
+              <td>Grand Total</td>
+              <td>{{ t.total_serving }}</td>
+              <td>₱{{ formatPeso(t.gross_sales) }}</td>
+              <td>₱{{ formatPeso(t.food_cost) }}</td>
+              <td>₱{{ formatPeso(t.vat) }}</td>
+              <td>₱{{ formatPeso(t.discount) }}</td>
+              <td>₱{{ formatPeso(t.gross_profit) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  </ng-container>
+
+</div>

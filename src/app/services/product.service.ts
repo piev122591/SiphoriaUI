@@ -35,8 +35,12 @@ export class ProductService {
     return this.http.patch(`https://siphoriabackend-production.up.railway.app/productDetails/${id}/price`, { price });
   }
 
-  createProduct(data: { name: string; categoryid: number }): Observable<any> {
+  createProduct(data: { name: string; categoryid: number; station?: 'drinks' | 'kitchen' | null }): Observable<any> {
     return this.http.post('https://siphoriabackend-production.up.railway.app/products', data);
+  }
+
+  updateProduct(id: number, data: { name: string; categoryid: number; station?: 'drinks' | 'kitchen' | null }): Observable<any> {
+    return this.http.put(`https://siphoriabackend-production.up.railway.app/products/${id}`, data);
   }
 
   createProductDetail(data: { productid: number; sizeid: number; price: number; fc?: number | null; image_url?: string }): Observable<any> {

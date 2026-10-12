@@ -30,7 +30,11 @@ export class AdminProductsComponent implements OnInit {
 
   showAddModal = false;
   submitting = false;
-  newProduct = { name: '', categoryid: null as number | null };
+  newProduct = { name: '', categoryid: null as number | null, station: null as 'drinks' | 'kitchen' | null };
+
+  editingProduct: any = null;
+  editProductForm = { name: '', categoryid: null as number | null, station: null as 'drinks' | 'kitchen' | null };
+  savingEditProduct = false;
 
   // Static catalogue of product image folders/files under public/products.
   // Update this map when images are added to/removed from those folders.
@@ -442,7 +446,7 @@ export class AdminProductsComponent implements OnInit {
   }
 
   openAddModal() {
-    this.newProduct = { name: '', categoryid: null };
+    this.newProduct = { name: '', categoryid: null, station: null };
     this.showAddModal = true;
   }
 
@@ -460,7 +464,8 @@ export class AdminProductsComponent implements OnInit {
 
     this.productService.createProduct({
       name: this.newProduct.name.trim(),
-      categoryid: this.newProduct.categoryid!
+      categoryid: this.newProduct.categoryid!,
+      station: this.newProduct.station
     }).subscribe({
       next: () => {
         this.loadProducts();
@@ -468,6 +473,40 @@ export class AdminProductsComponent implements OnInit {
         this.showAddModal = false;
       },
       error: () => { this.submitting = false; }
+    });
+  }
+
+  get canSubmitEditProduct(): boolean {
+    return !!this.editProductForm.name.trim() && !!this.editProductForm.categoryid;
+  }
+
+  openEditProduct(p: any) {
+    this.editingProduct = p;
+    this.editProductForm = { name: p.name, categoryid: p.categoryid, station: p.station ?? null };
+  }
+
+  cancelEditProduct() {
+    this.editingProduct = null;
+    this.editProductForm = { name: '', categoryid: null, station: null };
+  }
+
+  saveEditProduct() {
+    if (!this.canSubmitEditProduct || this.savingEditProduct || !this.editingProduct) return;
+    this.savingEditProduct = true;
+
+    this.productService.updateProduct(this.editingProduct.id, {
+      name: this.editProductForm.name.trim(),
+      categoryid: this.editProductForm.categoryid!,
+      station: this.editProductForm.station
+    }).subscribe({
+      next: () => {
+        this.editingProduct.name = this.editProductForm.name.trim();
+        this.editingProduct.categoryid = this.editProductForm.categoryid;
+        this.editingProduct.station = this.editProductForm.station;
+        this.savingEditProduct = false;
+        this.editingProduct = null;
+      },
+      error: () => { this.savingEditProduct = false; }
     });
   }
 }
