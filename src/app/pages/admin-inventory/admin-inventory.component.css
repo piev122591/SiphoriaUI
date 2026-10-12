@@ -508,3 +508,47 @@ tfoot .table-footer {
     overflow-x: auto;
   }
 }
+
+/* ===== HEADER ACTIONS (Scan / Print QR Labels) ===== */
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
+  background: #fff;
+  color: #5c3d2e;
+  border: 1px solid #e0d6cc;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: #c9a96e;
+  background: #fdfaf7;
+}
+
+.btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .header-actions {
+    justify-content: flex-start;
+  }
+}

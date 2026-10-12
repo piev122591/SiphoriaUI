@@ -10,6 +10,7 @@ import { PrinterService } from '../../services/printer.service';
 import { ProductModalComponent } from './product-modal/product-modal.component';
 import { ProductListComponent } from './product-list/product-list.component';
 import { SizeLabelPipe } from '../../pipes/size-label.pipe';
+import { availableServings } from '../../utils/stock';
 
 @Component({
   selector: 'app-self-order',
@@ -144,12 +145,24 @@ export class SelfOrderComponent implements OnInit {
     this.step = 3;
   }
 
+  // Servings the recipe can still make for this size (latest stock, not the copy in the cart)
+  stockOf(item: any): number {
+    const latest = this.productDetails.find((d: any) => d.id === item.id) ?? item;
+    return availableServings(latest);
+  }
+
+  canIncrease(item: any): boolean {
+    const inCart = this.cart.find(x => x.id === item.id)?.qty || 0;
+    return inCart < this.stockOf(item);
+  }
+
   addToCart(product: any) {
     const exist = this.cart.find(i => i.id === product.id);
+    const max = this.stockOf(product);
     if (exist) {
-      exist.qty += product.qty;
+      exist.qty = Math.min(exist.qty + product.qty, max);
     } else {
-      this.cart.push(product);
+      this.cart.push({ ...product, qty: Math.min(product.qty, max) });
     }
   }
 
@@ -186,9 +199,16 @@ export class SelfOrderComponent implements OnInit {
         this.selectedDiscountId = null;
         this.discountPercent = null;
         this.step = 1;
+        this.loadProductDetails(); // refresh stock / sold-out state
       },
-      error: (_) => {
+      error: (err) => {
         this.isPlacingOrder = false;
+        if (err?.status === 409) {
+          // Backend rejected the order: not enough stock for one or more items
+          this.loadProductDetails();
+          alert(err?.error?.message || 'Some items just sold out or have fewer servings left. Please review the order.');
+          return;
+        }
         alert('Failed to place order. Please try again.');
       }
     });
@@ -221,6 +241,7 @@ export class SelfOrderComponent implements OnInit {
   }
 
   increaseQty(product: any) {
+    if (!this.canIncrease(product)) return;
     const item = this.cart.find(x => x.id === product.id);
     if (item) {
       item.qty++;

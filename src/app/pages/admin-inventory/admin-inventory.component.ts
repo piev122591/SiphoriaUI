@@ -3,11 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from '../../services/inventory.service';
 import { LoadingService } from '../../services/loading.service';
+import { RouterLink } from '@angular/router';
+import * as QRCode from 'qrcode';
+
+// Public address of the deployed app (Firebase Hosting), used in printed QR labels
+const PUBLIC_APP_URL = 'https://siphoria-ui.web.app';
 
 @Component({
   selector: 'app-admin-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-inventory.component.html',
   styleUrls: ['./admin-inventory.component.css']
 })
@@ -231,5 +236,82 @@ export class AdminInventoryComponent implements OnInit {
       },
       error: () => { this.deletingDetailId = null; }
     });
+  }
+
+  // ===== QR LABELS =====
+  printingLabels = false;
+
+  // Each label links to /restock/:id, so the phone camera app opens the restock form directly.
+  // Labels are generated on the fly from the item id — nothing is stored.
+  async printLabels() {
+    const items = this.filteredItems;
+    if (!items.length || this.printingLabels) return;
+
+    // Open the window synchronously (inside the click) so popup blockers allow it
+    const win = window.open('', '_blank');
+    if (!win) {
+      alert('Please allow pop-ups for this site to print labels.');
+      return;
+    }
+    win.document.write('<p style="font-family:sans-serif;padding:20px">Generating labels…</p>');
+
+    this.printingLabels = true;
+    try {
+      const labels = await Promise.all(items.map(async item => ({
+        item,
+        qr: await QRCode.toDataURL(`${this.labelBaseUrl()}/restock/${item.id}`, { width: 320, margin: 1 })
+      })));
+      win.document.open();
+      win.document.write(this.buildLabelSheet(labels));
+      win.document.close();
+    } catch {
+      win.close();
+      alert('Failed to generate QR labels.');
+    } finally {
+      this.printingLabels = false;
+    }
+  }
+
+  // Labels must link to the live site so any phone camera can open them.
+  // When printing from a local dev server (localhost / LAN IP), use the public URL instead.
+  private labelBaseUrl(): string {
+    const { protocol, hostname, origin } = window.location;
+    const isLocal = protocol !== 'https:' ||
+      /^(localhost|127\.|0\.0\.0\.0|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(hostname);
+    return isLocal ? PUBLIC_APP_URL : origin;
+  }
+
+  private buildLabelSheet(labels: { item: any; qr: string }[]): string {
+    const entities: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+    const esc = (v: any) => String(v ?? '').replace(/[&<>"]/g, c => entities[c]);
+    const cards = labels.map(({ item, qr }) => `
+      <div class="label">
+        <img src="${qr}" alt="" />
+        <div class="name">${esc(item.name)}</div>
+        <div class="meta">${esc(item.unit)} · #${esc(item.id)}</div>
+        <div class="cta">Scan to restock</div>
+      </div>`).join('');
+
+    return `<!doctype html>
+<html><head><meta charset="utf-8"><title>Inventory QR Labels</title>
+<style>
+  @page { size: A4; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, sans-serif; color: #2c1810; }
+  .toolbar { padding: 12px; text-align: center; }
+  .toolbar button { padding: 10px 24px; font-size: 15px; cursor: pointer; }
+  .sheet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; padding: 6mm; }
+  .label { border: 1px dashed #bbb; border-radius: 3mm; padding: 4mm; text-align: center; break-inside: avoid; }
+  .label img { width: 38mm; height: 38mm; display: block; margin: 0 auto 2mm; }
+  .name { font-weight: 700; font-size: 13pt; line-height: 1.2; word-break: break-word; }
+  .meta { font-size: 9pt; color: #777; margin-top: 1mm; }
+  .cta { font-size: 8pt; color: #999; margin-top: 1mm; text-transform: uppercase; letter-spacing: 1px; }
+  @media print { .toolbar { display: none; } }
+</style></head>
+<body>
+  <div class="toolbar"><button onclick="window.print()">Print ${labels.length} label${labels.length === 1 ? '' : 's'}</button></div>
+  <div class="sheet">${cards}</div>
+  <script>window.onload = function () { setTimeout(function () { window.print(); }, 300); };</script>
+</body></html>`;
   }
 }

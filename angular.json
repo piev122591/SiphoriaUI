@@ -31,7 +31,9 @@
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "qz-tray"
+              "qz-tray",
+              "qrcode",
+              "jsrsasign"
             ]
           },
           "configurations": {
@@ -39,7 +41,7 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1MB",
+                  "maximumWarning": "1.5MB",
                   "maximumError": "2MB"
                 },
                 {

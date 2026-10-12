@@ -55,7 +55,9 @@ export class LoginComponent {
         localStorage.setItem('token', response.token);
         localStorage.setItem('username', credentials.username);
         this.isLoading = false;
-        this.router.navigate(['/admin/orders']);
+        // Only follow in-app paths, never external URLs
+        const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+        this.router.navigateByUrl(returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//') ? returnUrl : '/admin/orders');
       },
       error: () => {
         this.isLoading = false;

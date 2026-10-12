@@ -186,3 +186,32 @@
 .size-options button:hover {
   transform: scale(1.05);
 }
+.size-options button .stock-tag {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8d6e63;
+}
+
+.size-options button .stock-tag.low {
+  color: #c0392b;
+}
+
+.size-options button.active .stock-tag.low {
+  color: #ffb4a8;
+}
+
+.size-options button.sold-out,
+.size-options button:disabled {
+  background: #f3f0ee;
+  color: #b0a49e;
+  border-style: dashed;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.qty-control button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

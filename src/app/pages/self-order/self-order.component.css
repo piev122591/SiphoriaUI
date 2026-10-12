@@ -673,3 +673,8 @@
     background: #43a047;
   }
 }
+
+.qty-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

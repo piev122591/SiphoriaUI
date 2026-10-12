@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { SizeLabelPipe } from '../../../pipes/size-label.pipe';
+import { availableServings, isLowStock, isSoldOut } from '../../../utils/stock';
 
 @Component({
   selector: 'app-product-modal',
@@ -14,8 +15,12 @@ export class ProductModalComponent implements  OnChanges  {
 
   @Input() product: any;
   @Input() productsWithSizes: any[] = [];
+  @Input() cart: any[] = [];
   @Output() close = new EventEmitter();
   @Output() add = new EventEmitter();
+
+  readonly isSoldOut = isSoldOut;
+  readonly isLowStock = isLowStock;
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['product'] || changes['productsWithSizes']) {
@@ -32,8 +37,18 @@ export class ProductModalComponent implements  OnChanges  {
 
  qty: number = 1;
 
+// How many more of this size can still be added (stock minus what's already in the cart)
+remaining(p: any): number {
+  const inCart = this.cart.find(i => i.id === p?.id)?.qty || 0;
+  return availableServings(p) - inCart;
+}
+
+get maxQty(): number {
+  return this.selectedProductWithSize ? this.remaining(this.selectedProductWithSize) : Infinity;
+}
+
 increase() {
-  this.qty++;
+  if (this.qty < this.maxQty) this.qty++;
 }
 
 decrease() {
@@ -45,10 +60,10 @@ decrease() {
 isAdding = false;
 
 onAdd() {
-  if (this.isAdding) return;
+  if (this.isAdding || this.maxQty <= 0) return;
   this.isAdding = true;
   setTimeout(() => {
-    this.add.emit({ ...this.selectedProductWithSize, qty: this.qty });
+    this.add.emit({ ...this.selectedProductWithSize, qty: Math.min(this.qty, this.maxQty) });
     this.isAdding = false;
   }, 700);
 }
@@ -56,10 +71,10 @@ selectedProductWithSize: any;
 selectedSize: number | null = null;
 
 onSelectSize(p: any) {
+  if (this.remaining(p) <= 0) return;
   this.selectedProductWithSize = p;
   this.selectedSize = p.size;
-
-  console.log('Selected:', p);
+  this.qty = Math.min(this.qty, this.remaining(p));
 }
 getPrice(): number {
   return this.selectedProductWithSize?.price || 0;

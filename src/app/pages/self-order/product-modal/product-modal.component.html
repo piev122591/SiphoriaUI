@@ -22,9 +22,14 @@
         <button
           *ngFor="let p of productsWithSizes"
           [class.active]="selectedSize === p.size"
+          [class.sold-out]="remaining(p) <= 0"
+          [disabled]="remaining(p) <= 0"
           (click)="onSelectSize(p)"
         >
           {{ p.size | sizeLabel }}
+          <small class="stock-tag" *ngIf="isSoldOut(p)">Sold out</small>
+          <small class="stock-tag" *ngIf="!isSoldOut(p) && remaining(p) <= 0">Max in order</small>
+          <small class="stock-tag low" *ngIf="isLowStock(p) && remaining(p) > 0">{{ remaining(p) }} left</small>
         </button>
       </div>
     </div>
@@ -33,7 +38,7 @@
     <div class="qty-control">
       <button (click)="decrease()">−</button>
       <span>{{ qty }}</span>
-      <button (click)="increase()">+</button>
+      <button (click)="increase()" [disabled]="qty >= maxQty">+</button>
     </div>
 
     <!-- SUBTOTAL -->

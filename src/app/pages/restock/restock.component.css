@@ -1,0 +1,257 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #f8f3ed;
+}
+
+.restock-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: #2c1810;
+}
+
+.restock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.back-link {
+  color: #5c3d2e;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 0;
+}
+
+.page-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #c9a96e;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(44, 24, 16, 0.06);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+/* ITEM */
+
+.item-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+.stock-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stock-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #b0a090;
+}
+
+.stock-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.stock-value small {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #8a7565;
+}
+
+.stock-value.low {
+  color: #c0392b;
+}
+
+.low-badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  background: #fdecea;
+  color: #c0392b;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* FORM */
+
+.form-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #b0a090;
+  margin: 0 0 6px;
+}
+
+.optional {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #e0d6cc;
+  border-radius: 8px;
+  background: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; /* 16px stops iOS zooming on focus */
+  color: #3a2418;
+  outline: none;
+  margin-bottom: 18px;
+}
+
+.form-input:focus {
+  border-color: #c9a96e;
+}
+
+.qty-input {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 14px;
+}
+
+/* BUTTONS */
+
+.btn-primary,
+.btn-secondary {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #c9a96e;
+  color: #fff;
+  border: none;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #5c3d2e;
+  border: 1px solid #e0d6cc;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-row > * {
+  flex: 1;
+}
+
+.btn-link {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #8a7565;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* STATES */
+
+.success-card {
+  text-align: center;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #e6f4ea;
+  color: #2e7d4f;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 48px;
+}
+
+.success-text {
+  margin: 0 0 18px;
+  font-size: 1rem;
+}
+
+.state-card {
+  text-align: center;
+}
+
+.error-text {
+  color: #c0392b;
+  font-size: 0.88rem;
+  margin: 0 0 14px;
+}
+
+.state-box {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.pulse-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.pulse-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c9a96e;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.pulse-dots span:nth-child(2) { animation-delay: 0.2s; }
+.pulse-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}

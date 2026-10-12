@@ -1,0 +1,64 @@
+<div class="restock-page">
+
+  <header class="restock-header">
+    <a routerLink="/admin/inventory" class="back-link">← Inventory</a>
+    <span class="page-tag">Restock</span>
+  </header>
+
+  <!-- LOADING -->
+  <div class="state-box" *ngIf="isLoading">
+    <div class="pulse-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="card state-card" *ngIf="!isLoading && errorMessage">
+    <p class="error-text">{{ errorMessage }}</p>
+    <button class="btn-primary" (click)="scanNext()">Scan another code</button>
+  </div>
+
+  <ng-container *ngIf="!isLoading && item">
+
+    <!-- ITEM -->
+    <div class="card item-card">
+      <h1 class="item-name">{{ item.name }}</h1>
+      <div class="stock-row">
+        <span class="stock-label">Current stock</span>
+        <span class="stock-value" [class.low]="isLowStock">
+          {{ item.quantity_remaining | number:'1.0-2' }} <small>{{ item.unit }}</small>
+        </span>
+      </div>
+      <span class="low-badge" *ngIf="isLowStock">Low stock · reorder at {{ item.reorder_level | number:'1.0-2' }}</span>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="card success-card" *ngIf="savedQty !== null">
+      <div class="success-icon">✓</div>
+      <p class="success-text">Added <strong>{{ savedQty | number:'1.0-2' }} {{ item.unit }}</strong></p>
+      <div class="btn-row">
+        <button class="btn-secondary" (click)="addMore()">Add more</button>
+        <button class="btn-primary" (click)="scanNext()">Scan next item</button>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form class="card form-card" *ngIf="savedQty === null" (ngSubmit)="save()">
+      <label class="form-label" for="qty">Quantity to add ({{ item.unit }})</label>
+      <input #qtyInput id="qty" name="qty" class="form-input qty-input" type="number"
+             inputmode="decimal" min="0" step="any" placeholder="0"
+             [(ngModel)]="quantity" />
+
+      <label class="form-label" for="note">Note <span class="optional">(optional)</span></label>
+      <input id="note" name="note" class="form-input" type="text"
+             placeholder="e.g. Delivery from supplier" [(ngModel)]="note" />
+
+      <p class="error-text" *ngIf="saveError">{{ saveError }}</p>
+
+      <button type="submit" class="btn-primary btn-block" [disabled]="!canSave">
+        {{ saving ? 'Saving…' : 'Add Stock' }}
+      </button>
+      <button type="button" class="btn-link" (click)="scanNext()">Scan a different item</button>
+    </form>
+
+  </ng-container>
+
+</div>

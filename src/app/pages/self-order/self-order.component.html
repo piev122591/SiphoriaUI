@@ -24,7 +24,7 @@
       <h2 class="title">Choose Category</h2>
       <div class="category-grid">
         <div class="category-card" *ngFor="let c of categories" (click)="selectCategory(c)">
-          <img [src]="c.image_url" />
+          <img [src]="c.image_url" loading="lazy" decoding="async" />
           <h3>{{ c.name }}</h3>
         </div>
       </div>
@@ -35,6 +35,7 @@
       <h2 class="category-title">{{ selectedCategory }}</h2>
       <app-product-list
         [products]="filteredProducts"
+        [productDetails]="productDetails"
         (productSelected)="onProductSelected($event)">
       </app-product-list>
       <button class="view-order-btn" (click)="step = 5">View Order</button>
@@ -53,7 +54,7 @@
         <div class="order-controls">
           <button class="qty-btn" (click)="decreaseQty(item)">−</button>
           <span class="qty-number">{{ item.qty }}</span>
-          <button class="qty-btn" (click)="increaseQty(item)">+</button>
+          <button class="qty-btn" (click)="increaseQty(item)" [disabled]="!canIncrease(item)">+</button>
           <button class="remove-btn" (click)="removeItem(item)">✕</button>
         </div>
         <div class="item-total">₱{{ item.price * item.qty }}</div>
@@ -150,7 +151,7 @@
         [class.active]="selectedCategoryId === c.id"
         (click)="selectCategory(c)"
       >
-        <img [src]="c.image_url" />
+        <img [src]="c.image_url" loading="lazy" decoding="async" />
         <span>{{ c.name }}</span>
       </button>
     </div>
@@ -163,6 +164,7 @@
       <div class="pos-product-grid">
         <app-product-list
           [products]="filteredProducts"
+        [productDetails]="productDetails"
           (productSelected)="onProductSelected($event)">
         </app-product-list>
       </div>
@@ -189,7 +191,7 @@
         <div class="order-controls">
           <button class="qty-btn" (click)="decreaseQty(item)">−</button>
           <span class="qty-number">{{ item.qty }}</span>
-          <button class="qty-btn" (click)="increaseQty(item)">+</button>
+          <button class="qty-btn" (click)="increaseQty(item)" [disabled]="!canIncrease(item)">+</button>
           <button class="remove-btn" (click)="removeItem(item)">✕</button>
         </div>
         <div class="item-total">₱{{ item.price * item.qty }}</div>
@@ -281,6 +283,7 @@
   *ngIf="selectedProduct"
   [product]="selectedProduct"
   [productsWithSizes]="selectedProductListWithSizes"
+  [cart]="cart"
   (close)="closeModal()"
   (add)="addToCart($event); closeModal()"
 ></app-product-modal>

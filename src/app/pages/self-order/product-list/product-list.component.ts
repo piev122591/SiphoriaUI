@@ -1,7 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../../services/product.service';
-import { LoadingService } from '../../../services/loading.service';
+import { isSoldOut } from '../../../utils/stock';
 
 @Component({
   selector: 'app-product-list',
@@ -10,31 +9,24 @@ import { LoadingService } from '../../../services/loading.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent {
   @Input() products: any[] = [];
+  // Loaded once by the menu page so stock can be refreshed after each order
+  @Input() productDetails: any[] = [];
   @Output() productSelected = new EventEmitter<{ product: any; variants: any[] }>();
 
-  private productDetails: any[] = [];
-
-  constructor(
-    private productService: ProductService,
-    private loadingService: LoadingService
-  ) {}
-
-  ngOnInit(): void {
-    this.loadProductDetails();
+  private variantsOf(product: any): any[] {
+    return this.productDetails.filter(p => p.productId === product.id);
   }
 
-  loadProductDetails() {
-    this.loadingService.start();
-    this.productService.getProductDetails().subscribe({
-      next: res => { this.productDetails = res; this.loadingService.stop(); },
-      error: () => this.loadingService.stop()
-    });
+  // Sold out only when every size is sold out
+  isProductSoldOut(product: any): boolean {
+    const variants = this.variantsOf(product);
+    return variants.length > 0 && variants.every(v => isSoldOut(v));
   }
 
   openProductModal(product: any) {
-    const variants = this.productDetails.filter(p => p.productId === product.id);
-    this.productSelected.emit({ product, variants });
+    if (this.isProductSoldOut(product)) return;
+    this.productSelected.emit({ product, variants: this.variantsOf(product) });
   }
 }
